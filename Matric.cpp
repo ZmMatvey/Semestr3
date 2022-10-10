@@ -1,52 +1,52 @@
 #include "Vector.cpp"
-#include "Matric.h"
+#include "Matrix.h"
 
-Matric::Matric (unsigned int a, unsigned int b): m(a), n(b), V (new Vector[a]) {
+Matrix::Matrix (unsigned int a, unsigned int b): m(a), n(b), V (new Vector[a]) {
     for (unsigned int i = 0; i < a; i++) {
         V[i] = Vector(b);
     }
 }
 
-Matric::Matric(const Matric& B): Matric(B.m, B.n)  {
+Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
     for (unsigned int i = 0; i < m; i++) {
         V[i] = B.V[i];
     }
 }
 
-unsigned int Matric::GetM_m() {
+unsigned int Matrix::GetM_m() {
     return m;
 }
 
-unsigned int Matric::GetM_n() {
+unsigned int Matrix::GetM_n() {
     return n;
 }
 
-void Matric::SetM_fill() {
+void Matrix::SetM_fill() {
     for (unsigned int i = 0; i < m; i++) {
         V[i].Set_fill();
     }
 }
 
-void Matric::SetM_fill(Vector* X) {
+void Matrix::SetM_fill(Vector* X) {
     for (unsigned int i = 0; i < m; i++) {
         V[i] = X[i];
     }
 }
 
-void Matric::Cout_Matric() {
+void Matrix::Cout_Matrix() {
     for (unsigned int i = 0; i < m; i++) {
         V[i].Cout_Vector();
     }
     cout<<'\n';
 }
 
-void Matric::stringij(unsigned int i, unsigned int j) {
+void Matrix::stringij(unsigned int i, unsigned int j) {
     Vector c = V[i];
     V[i] = V[j];
     V[j] = c;
 }
 
-void Matric::columnij(unsigned int i, unsigned int j) {
+void Matrix::columnij(unsigned int i, unsigned int j) {
     double c;
     for (unsigned int t = 0; t < m; i++) {
         c = V[t].v[i];
@@ -55,8 +55,8 @@ void Matric::columnij(unsigned int i, unsigned int j) {
     }
 }
 
-Matric Matric::T() {
-    Matric X = Matric(n, m);
+Matrix Matrix::T() {
+    Matrix X = Matrix(n, m);
     for (unsigned int i = 0; i < m; i++) {
         for (unsigned int j = 0; j < n; j++) {
             X.V[j].v[i] = V[i].v[j];
@@ -65,10 +65,10 @@ Matric Matric::T() {
     return X;
 }
 
-Matric Matric::inverseA() {
+Matrix Matrix::inverseA() {
     if (det(*this) != 0) {
-        Matric X = E(n);
-        Matric A = Matric(n, n);
+        Matrix X = E(n);
+        Matrix A = Matrix(n, n);
         A = *this;
         for (unsigned int j = 0; j < n; j++) {
             unsigned int i = 0;
@@ -100,13 +100,13 @@ Matric Matric::inverseA() {
     }
 }
 
-double Matric::xi(double x) {
+double Matrix::xi(double x) {
     if (n == m) {
         return det((*this) - x*E(n));
     }
 }
 
-Matric& Matric::operator= (const Matric& B) {
+Matrix& Matrix::operator= (const Matrix& B) {
     if (m == B.m && n == B.n) {
         if (this == &B) {
             return *this;
@@ -118,12 +118,12 @@ Matric& Matric::operator= (const Matric& B) {
     }
 }
 
-Matric::~Matric () {
+Matrix::~Matrix () {
     delete []V;
 }
 
-Matric E(unsigned int n) {
-    Matric A = Matric(n, n);
+Matrix E(unsigned int n) {
+    Matrix A = Matrix(n, n);
     for (unsigned int i = 0; i < n; i++) {
         for (unsigned int j = 0; j < n; j++) {
             if (i == j) {
@@ -137,8 +137,8 @@ Matric E(unsigned int n) {
     return A;
 }
 
-Matric O(unsigned int m, unsigned int n) {
-    Matric A = Matric(m, n);
+Matrix O(unsigned int m, unsigned int n) {
+    Matrix A = Matrix(m, n);
     for (unsigned int i = 0; i < n; i++) {
         for (unsigned int j = 0; j < n; j++) {
             A.V[i].v[j] = 0;
@@ -147,7 +147,7 @@ Matric O(unsigned int m, unsigned int n) {
     return A;
 }
 
-double tr(Matric A) {
+double tr(Matrix A) {
     unsigned int n = A.GetM_n();
     unsigned int m = A.GetM_m();
     if (n == m) {
@@ -159,7 +159,7 @@ double tr(Matric A) {
     }
 }
 
-double det(Matric A) {
+double det(Matrix A) {
     unsigned int n = A.GetM_n();
     unsigned int m = A.GetM_m();
     double x = 1;
@@ -191,13 +191,13 @@ double det(Matric A) {
     return 0;
 }
 
-Matric operator+ (Matric A, Matric B) {
+Matrix operator+ (Matrix A, Matrix B) {
     unsigned int x = A.GetM_m();
     unsigned int y = B.GetM_m();
     unsigned int x1 = A.GetM_n();
     unsigned int y1 = B.GetM_n();
     if (x == y && x1 == y1) {
-        Matric C = Matric(x, x1);
+        Matrix C = Matrix(x, x1);
         for (unsigned int i = 0; i < x; i++) {
             C.V[i] = A.V[i] + B.V[i];
         }
@@ -205,13 +205,13 @@ Matric operator+ (Matric A, Matric B) {
     }
 }
 
-Matric operator- (Matric A, Matric B) {
+Matrix operator- (Matrix A, Matrix B) {
     unsigned int x = A.GetM_m();
     unsigned int y = B.GetM_m();
     unsigned int x1 = A.GetM_n();
     unsigned int y1 = B.GetM_n();
     if (x == y && x1 == y1) {
-        Matric C = Matric(x, x1);
+        Matrix C = Matrix(x, x1);
         for (unsigned int i = 0; i < x; i++) {
             C.V[i] = A.V[i] - B.V[i];
         }
@@ -219,7 +219,7 @@ Matric operator- (Matric A, Matric B) {
     }
 }
 
-bool operator== (Matric A, Matric B) {
+bool operator== (Matrix A, Matrix B) {
     unsigned int x = A.GetM_m();
     unsigned int y = B.GetM_m();
     unsigned int x1 = A.GetM_n();
@@ -235,7 +235,7 @@ bool operator== (Matric A, Matric B) {
 
 }
 
-Matric operator* (double a, Matric B) {
+Matrix operator* (double a, Matrix B) {
     unsigned int x = B.GetM_m();
     for (unsigned int i = 0; i < x; i++) {
         B.V[i] = a*B.V[i];
@@ -243,7 +243,7 @@ Matric operator* (double a, Matric B) {
     return B;
 }
 
-Vector operator* (Vector a, Matric B) {
+Vector operator* (Vector a, Matrix B) {
     unsigned int x = a.Get_N();
     unsigned int y = B.GetM_m();
     unsigned int z = B.GetM_n();
@@ -258,7 +258,7 @@ Vector operator* (Vector a, Matric B) {
     }
 }
 
-Vector operator* (Matric A, Vector b) {
+Vector operator* (Matrix A, Vector b) {
     unsigned int x = b.Get_N();
     unsigned int y = A.GetM_n();
     unsigned int z = A.GetM_m();
@@ -273,13 +273,13 @@ Vector operator* (Matric A, Vector b) {
     }
 }
 
-Matric operator* (Matric A, Matric B) {
+Matrix operator* (Matrix A, Matrix B) {
     unsigned int x = A.GetM_m();
     unsigned int y = A.GetM_n();
     unsigned int x1 = B.GetM_m();
     unsigned int y1 = B.GetM_n();
     if (y == x1) {
-        Matric T = Matric(x, y1);
+        Matrix T = Matrix(x, y1);
         for (unsigned int i = 0; i < x; i++) {
             T.V[i] = A.V[i]*B;
         }
@@ -287,7 +287,7 @@ Matric operator* (Matric A, Matric B) {
     }
 }
 
-Matric operator/ (Matric B, double a) {
+Matrix operator/ (Matrix B, double a) {
     return (1.0/a)*B;
 }
 
