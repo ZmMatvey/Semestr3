@@ -288,3 +288,25 @@ Matrix operator/ (Matrix B, double a) {
     return (1.0/a)*B;
 }
 
+Matrix operator^ (Matrix A, int n) {
+    if (A.GetM_m() == A.GetM_n()) {
+        if (n < 0) {
+            Matrix B = A.inverse();
+            A = B;
+            for (int i = n + 1; i < 0; i++) {
+                A = A*B;
+            }
+            return A;
+        }
+        if (n == 0) {
+            return E(A.GetM_n());
+        }
+        if (n > 0) {
+            Matrix B = A;
+            for (int i = n - 1; i > 0; i--) {
+                A = A*B;
+            }
+            return A;
+        }
+    }
+}
