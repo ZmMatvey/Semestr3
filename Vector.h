@@ -1,34 +1,34 @@
 class Vector
 {
 protected:
-unsigned int N; //размер вектора
+unsigned int N; //vector size
 
 public:
-double* const v;
+double* const v; //double array
 
-Vector();
+Vector();  //not finalized, not consistent with the matrix class
 
-Vector(const Vector& b);//правило Ѕольшой тройки 1-конструктор копировани€
+Vector(const Vector& b); //rule of three 1-copy constructor
 
-Vector (unsigned int a);//создаЄт вектор из R^a
+Vector (unsigned int a); //creates a vector from R^a
 
 unsigned int Get_N();
 
-void Set_fill();//заполнение вектора вручную
+void Set_fill(); //filling in the vector manually
 
-void Set_fill(double* x);//заполнение вектора при помощи массива
+void Set_fill(double* x); //filling a vector with an array
 
-void Cout_Vector(); //вывод вектора
+void Cout_Vector(); //vector output
 
-Vector& operator= (const Vector& b);//правило Ѕольшой тройки 2-оператор присваивани€
+Vector& operator= (const Vector& b); //rule of three 2-assignment operator
 
-~Vector ();//правило Ѕольшой тройки 3-деструктор
+~Vector (); //rule of the big three 3-destructor
 
 };
 
-Vector o(unsigned int a); //нулевой вектор
+Vector o(unsigned int a); //zero vector
 Vector operator+ (Vector a, Vector b); //a+b
 Vector operator- (Vector a, Vector b); //a-b
 bool operator== (Vector a, Vector b); //a == b
-Vector operator* (double a, Vector b); //умножение вектора b на скал€р а
+Vector operator* (double a, Vector b); //a*b
 Vector operator/ (Vector b, double a); //b/a
