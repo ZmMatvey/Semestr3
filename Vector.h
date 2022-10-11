@@ -22,7 +22,7 @@ void Cout_Vector(); //vector output
 
 Vector& operator= (const Vector& b); //rule of three 2-assignment operator
 
-~Vector (); //rule of the big three 3-destructor
+~Vector (); //rule of three 3-destructor
 
 };
 
