@@ -45,7 +45,6 @@ double det(Matrix A); //determinant of the matrix A
 double tr(Matrix A); //the trace of the matrix A
 //int rg(Matrix A); //matrix rank A
 //Matrix SOL(Matrix A);//solution of a linear matrix equation of the form A*x=b
-//Matrix EXP(Matrix A); //matrix exponent
 Matrix operator+ (Matrix A, Matrix B); //A+B
 Matrix operator- (Matrix A, Matrix B); //A-B
 bool operator== (Matrix A, Matrix B); //A == B
@@ -54,6 +53,5 @@ Vector operator* (Vector a, Matrix B); //multiplying a string vector by a matrix
 Vector operator* (Matrix A, Vector b); //multiplying a matrix by a column vector
 Matrix operator* (Matrix A, Matrix B); //A*B
 Matrix operator/ (Matrix B, double a); //B/a
-//Matrix operator[] (Matrix A, Matrix B); //[A,B] = A*B-B*A
 //Matrix operator^ (Matrix A, int n); //A^n exponentiation of the matrix
 
