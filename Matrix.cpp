@@ -79,10 +79,10 @@ Matrix Matrix::inverse() {
             A.stringij(i, j);
             X.V[j] = X.V[j]/A.V[j].v[j];
             A.V[j] = A.V[j]/A.V[j].v[j];
-            i = 1;
-            while (i+j < n) {
-                X.V[i+j] = X.V[i+j] - A.V[i+j].v[j]* X.V[j];
-                A.V[i+j] = A.V[i+j] - A.V[i+j].v[j]* A.V[j];
+            i++;
+            while (i < n) {
+                X.V[i] = X.V[i] - A.V[i].v[j]* X.V[j];
+                A.V[i] = A.V[i] - A.V[i].v[j]* A.V[j];
                 i++;
             }
         }
@@ -169,23 +169,44 @@ double det(Matrix A) {
             if (i == n) {
                 return 0;
             }
-            else {
-                if (i != j) {
-                    A.stringij(i, j);
-                    x = x*(-1);
-                }
+            if (i != j) {
+                A.stringij(i, j);
+                x = x*(-1);
             }
             x = x * A.V[j].v[j];
             A.V[j] = A.V[j]/A.V[j].v[j];
-            i = 1;
-            while (i+j < n) {
-                A.V[i+j] = A.V[i+j] - A.V[i+j].v[j]* A.V[j];
+            i++;
+            while (i < n) {
+                A.V[i] = A.V[i] - A.V[i].v[j]* A.V[j];
                 i++;
             }
         }
         return x;
     }
     return 0;
+}
+
+int rg(Matrix A) {
+    int x = 0;
+    unsigned int n = A.GetM_n();
+    unsigned int m = A.GetM_m();
+    for (unsigned int j = 0; j < n; j++) {
+        unsigned int i = x;
+        while (A.V[i].v[j] == 0 && i < m) {
+            i++;
+        }
+        if (i < m) {
+            x++;
+            A.stringij(i, x);
+            A.V[x] = A.V[x]/A.V[x].v[j];
+            i++ ;
+            while (i < n) {
+                A.V[i] = A.V[i] - A.V[i].v[j]* A.V[x];
+                i++;
+            }
+        }
+    }
+    return x;
 }
 
 Matrix operator+ (Matrix A, Matrix B) {
