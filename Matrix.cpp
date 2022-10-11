@@ -1,11 +1,7 @@
 #include "Vector.cpp"
 #include "Matrix.h"
 
-Matrix::Matrix (unsigned int a, unsigned int b): m(a), n(b), V (new Vector[a]) {
-    for (unsigned int i = 0; i < a; i++) {
-        V[i] = Vector(b);
-    }
-}
+Matrix::Matrix (unsigned int a, unsigned int b): m(a), n(b), V (new Vector[a]) {}
 
 Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
     for (unsigned int i = 0; i < m; i++) {
@@ -41,17 +37,21 @@ void Matrix::Cout_Matrix() {
 }
 
 void Matrix::stringij(unsigned int i, unsigned int j) {
-    Vector c = V[i];
-    V[i] = V[j];
-    V[j] = c;
+    if (i != j) {
+        Vector c = V[i];
+        V[i] = V[j];
+        V[j] = c;
+    }
 }
 
 void Matrix::columnij(unsigned int i, unsigned int j) {
-    double c;
-    for (unsigned int t = 0; t < m; i++) {
-        c = V[t].v[i];
-        V[t].v[i] = V[t].v[j];
-        V[t].v[j] = c;
+    if (i != j) {
+        double c;
+        for (unsigned int t = 0; t < m; i++) {
+            c = V[t].v[i];
+            V[t].v[i] = V[t].v[j];
+            V[t].v[j] = c;
+        }
     }
 }
 
@@ -71,12 +71,12 @@ Matrix Matrix::inverseA() {
         Matrix A = Matrix(n, n);
         A = *this;
         for (unsigned int j = 0; j < n; j++) {
-            unsigned int i = 0;
-            while (A.V[i+j].v[j] == 0 && i+j < n) {
+            unsigned int i = j;
+            while (A.V[i].v[j] == 0 && i+j < n) {
                 i++;
             }
-            X.stringij(i+j, j);
-            A.stringij(i+j, j);
+            X.stringij(i, j);
+            A.stringij(i, j);
             X.V[j] = X.V[j]/A.V[j].v[j];
             A.V[j] = A.V[j]/A.V[j].v[j];
             i = 1;
@@ -94,9 +94,6 @@ Matrix Matrix::inverseA() {
             }
         }
         return X;
-    }
-    else {
-        cout<<"det = 0"<<endl;
     }
 }
 
@@ -165,16 +162,16 @@ double det(Matrix A) {
     double x = 1;
     if (n == m) {
         for (unsigned int j = 0; j < n; j++) {
-            unsigned int i = 0;
-            while (A.V[i+j].v[j] == 0 && i+j < n) {
+            unsigned int i = j;
+            while (A.V[i].v[j] == 0 && i+j < n) {
                 i++;
             }
-            if (i+j == n) {
+            if (i == n) {
                 return 0;
             }
             else {
-                if (i+j != j) {
-                    A.stringij(i+j, j);
+                if (i != j) {
+                    A.stringij(i, j);
                     x = x*(-1);
                 }
             }
