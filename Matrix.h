@@ -41,9 +41,9 @@ Matrix& operator= (const Matrix& B); //rule of three-2 assignment operator
 
 Matrix E(unsigned int n); //a unit matrix of size nxn
 Matrix O(unsigned int m, unsigned int n); //zero matrix with dimensions mxn
-double det(Matrix A); //determinant of the matrix A
 double tr(Matrix A); //the trace of the matrix A
-//int rg(Matrix A); //matrix rank A
+double det(Matrix A); //determinant of the matrix A
+int rg(Matrix A); //matrix rank A
 //Matrix SOL(Matrix A);//solution of a linear matrix equation of the form A*x=b
 Matrix operator+ (Matrix A, Matrix B); //A+B
 Matrix operator- (Matrix A, Matrix B); //A-B
@@ -54,4 +54,3 @@ Vector operator* (Matrix A, Vector b); //multiplying a matrix by a column vector
 Matrix operator* (Matrix A, Matrix B); //A*B
 Matrix operator/ (Matrix B, double a); //B/a
 Matrix operator^ (Matrix A, int n); //A^n exponentiation of the matrix
-
