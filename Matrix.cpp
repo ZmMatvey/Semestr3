@@ -65,7 +65,7 @@ Matrix Matrix::T() {
     return X;
 }
 
-Matrix Matrix::inverseA() {
+Matrix Matrix::inverse() {
     if (det(*this) != 0) {
         Matrix X = E(n);
         Matrix A = Matrix(n, n);
