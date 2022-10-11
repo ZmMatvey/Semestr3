@@ -28,7 +28,7 @@ void columnij(unsigned int i, unsigned int j); //swaps i, j column
 
 Matrix T(); //transposed matrix
   
-Matrix inverseA(); //inverse matrix
+Matrix inverse(); //inverse matrix
 
 //int* p(); //positive and negative inertia indices
 
