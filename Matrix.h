@@ -53,5 +53,5 @@ Vector operator* (Vector a, Matrix B); //multiplying a string vector by a matrix
 Vector operator* (Matrix A, Vector b); //multiplying a matrix by a column vector
 Matrix operator* (Matrix A, Matrix B); //A*B
 Matrix operator/ (Matrix B, double a); //B/a
-//Matrix operator^ (Matrix A, int n); //A^n exponentiation of the matrix
+Matrix operator^ (Matrix A, int n); //A^n exponentiation of the matrix
 
