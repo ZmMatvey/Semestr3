@@ -188,22 +188,22 @@ double det(Matrix A) {
 
 int rg(Matrix A) {
     int x = 0;
-    unsigned int n = A.GetM_n();
     unsigned int m = A.GetM_m();
+    unsigned int n = A.GetM_n();
     for (unsigned int j = 0; j < n; j++) {
         unsigned int i = x;
-        while (A.V[i].v[j] == 0 && i < m) {
+        while (i < m && A.V[i].v[j] == 0) {
             i++;
         }
         if (i < m) {
-            x++;
             A.stringij(i, x);
             A.V[x] = A.V[x]/A.V[x].v[j];
             i++ ;
-            while (i < n) {
+            while (i < m) {
                 A.V[i] = A.V[i] - A.V[i].v[j]* A.V[x];
                 i++;
             }
+            x++;
         }
     }
     return x;
