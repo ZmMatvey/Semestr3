@@ -127,7 +127,10 @@ Matrix& Matrix::operator= (Matrix&& B) {
 }
 
 Matrix::~Matrix () {
-    delete []V;
+    for (auto begin = V, end = V + m; begin != end; ++begin) {
+        (begin)->~Vector();
+    }
+    delete V;
 }
 
 Vector& Matrix::operator[] (int i) {
