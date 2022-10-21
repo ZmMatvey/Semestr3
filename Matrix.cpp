@@ -5,9 +5,9 @@
 Matrix::Matrix (int m, int n): m(m), n(n) {
     void * memory = operator new (sizeof(Vector) * m);
     V = (Vector*)memory;
-    for (auto begin = V, end = V + m; begin != end; ++begin)
-    new (begin) Vector(n);
-    
+    for (auto begin = V, end = V + m; begin != end; ++begin) {
+        new (begin) Vector(n);
+    }
 }
 
 Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
