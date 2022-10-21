@@ -4,8 +4,8 @@
 
 Matrix::Matrix (int m, int n): m(m), n(n) {
     void * memory = operator new (sizeof(Vector) * m);
-    Vector *vectors = (Vector*)memory;
-    for (auto begin = vectors, end = vectors + m; begin != end; ++begin)
+    Vector* V = (Vector*)memory;
+    for (auto begin = V, end = V + m; begin != end; ++begin)
     new (begin) Vector(n);
     
 }
