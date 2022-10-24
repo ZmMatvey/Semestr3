@@ -83,4 +83,4 @@ double det(Matrix A);//определитель матрицы A
 
 int rg(Matrix A);//ранг матрицы A
 
-Matrix SOL(Matrix A, Vector b);//решение линейного матричного уравнения вида A*x=b
+Matrix SOL(Matrix& A, Vector& b);//решение линейного матричного уравнения вида A*x=b
