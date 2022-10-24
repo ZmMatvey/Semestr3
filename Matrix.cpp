@@ -85,7 +85,7 @@ Matrix Matrix::T() {
 }
 
 Matrix Matrix::inverse() {
-    assert(det(*this) != 0);
+    assert((int)(det(*this)*10000000)/10 != 0);
     int n = this->n;
     Matrix X = E(n);
     Matrix A = *this;
@@ -341,7 +341,7 @@ int rg(Matrix A) {
     int m = A.get_m();
     for (int j = 0; j < n; j++) {
         int i = x;
-        while (i < m && A[i][j] == 0) {
+        while (i < m && (int)(A[i][j]*10000000) == 0) {
             i++;
         }
         if (i < m) {
