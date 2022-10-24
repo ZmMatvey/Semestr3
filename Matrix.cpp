@@ -2,8 +2,8 @@
 #include <assert.h>
 #include "Matrix.h"
 
-Matrix::Matrix (int m, int n): m(m), n(n) {
-    void * memory = operator new (sizeof(Vector) * m);
+Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
+    void * memory = operator new (sizeof(Vector) * m);      //магия выделения памяти
     V = (Vector*)memory;
     for (auto begin = V, end = V + m; begin != end; ++begin) {
         new (begin) Vector(n);
@@ -11,6 +11,7 @@ Matrix::Matrix (int m, int n): m(m), n(n) {
 }
 
 Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
+    int m = this->m;
     for (int i = 0; i < m; i++) {
         V[i] = B.V[i];
     }
@@ -18,41 +19,50 @@ Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
 
 Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), V(B.V) {}
 
-int Matrix::GetM_m() {
+int Matrix::get_m()const {
     return m;
 }
 
-int Matrix::GetM_n() {
+int Matrix::get_n()const {
     return n;
 }
 
-void Matrix::SetM_fill() {
-    for (int i = 0; i < m; i++) {
-        V[i].Set_fill();
-    }
+Vector* Matrix::get_V() {
+    return V;
 }
 
-void Matrix::SetM_fill(Vector* X) {
+void Matrix::set_fill() {
+    int m = this->m;
+    for (int i = 0; i < m; i++) {
+        V[i].set_fill();
+    }
+    std::cout<<'\n';
+}
+
+void Matrix::set_fill(Vector* X) {
+    int m = this->m;
     for (int i = 0; i < m; i++) {
         V[i] = X[i];
     }
 }
 
-void Matrix::Cout_Matrix() {
+void Matrix::cout_Matrix() {
+    int m = this->m;
     for (int i = 0; i < m; i++) {
-        V[i].Cout_Vector();
+        V[i].cout_Vector();
     }
     std::cout<<'\n';
 }
 
-void Matrix::stringij(int i, int j) {
+void Matrix::stringij(unsigned int i, unsigned int j) {
     if (i != j) {
         std::swap(V[i], V[j]);
     }
 }
 
-void Matrix::columnij(int i, int j) {
+void Matrix::columnij(unsigned int i, unsigned int j) {
     if (i != j) {
+        int m = this->m;
         double c;
         for (int t = 0; t < m; i++) {
             c = V[t][i];
@@ -63,10 +73,12 @@ void Matrix::columnij(int i, int j) {
 }
 
 Matrix Matrix::T() {
+    int m = this->m;
+    int n = this->n;
     Matrix X = Matrix(n, m);
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            X[j][i] = V[i][j];
+            X.V[j][i] = V[i][j];
         }
     }
     return X;
@@ -74,29 +86,29 @@ Matrix Matrix::T() {
 
 Matrix Matrix::inverse() {
     assert(det(*this) != 0);
+    int n = this->n;
     Matrix X = E(n);
-    Matrix A = Matrix(n, n);
-    A = *this;
+    Matrix A = *this;
     for (int j = 0; j < n; j++) {
         int i = j;
-        while (i < n && A[i][j] == 0) {
+        while (i < n && A.V[i][j] == 0) {
             i++;
         }
         X.stringij(i, j);
         A.stringij(i, j);
-        X[j] = X[j]/A[j][j];
-        A[j] = A[j]/A[j][j];
+        X.V[j] = X.V[j]/A.V[j][j];
+        A.V[j] = A.V[j]/A.V[j][j];
         i++;
         while (i < n) {
-            X[i] = X[i] - A[i][j]* X[j];
-            A[i] = A[i] - A[i][j]* A[j];
+            X.V[i] = X.V[i] - A.V[i][j] * X.V[j];
+            A.V[i] = A.V[i] - A.V[i][j] * A.V[j];
             i++;
         }
     }
     for (int j = n - 1; j > 0; j--) {
         int i = j - 1;
         while (i >= 0) {
-            X[i] = X[i] - A[i][j]*X[j];
+            X.V[i] = X.V[i] - A.V[i][j] * X.V[j];
             i--;
         }
     }
@@ -105,10 +117,12 @@ Matrix Matrix::inverse() {
 
 double Matrix::xi(double x) {
     assert (n == m);
-    return det((*this) - x*E(n));
+    return det((*this) - E(n) * x);
 }
 
 Matrix& Matrix::operator= (const Matrix& B) {
+    int m = this->m;
+    int n = this->n;
     assert (m == B.m && n == B.n);
     if (this == &B) {
         return *this;
@@ -120,24 +134,144 @@ Matrix& Matrix::operator= (const Matrix& B) {
 }
 
 Matrix& Matrix::operator= (Matrix&& B) {
-    this->m = B.m;
-    this->n = B.n;
-    this->V = B.V;
+    m = B.m;
+    n = B.n;
+    V = B.V;
+    B.V = NULL;
     return *this;
 }
 
-Matrix::~Matrix () {
-    for (auto begin = V, end = V + m; begin != end; ++begin) {
-        (begin)->~Vector();
-    }
-    delete V;
-}
-
-Vector& Matrix::operator[] (int i) {
+Vector& Matrix::operator[] (unsigned int i) {
     return V[i];
 }
 
-Matrix E(int n) {
+Matrix Matrix::operator+ (const Matrix& B) {
+    int m = this->m;
+    int n = this->n;
+    assert(m == B.m && n == B.n);
+    Matrix C = Matrix(m, n);
+    for (int i = 0; i < m; i++) {
+        C.V[i] = V[i] + B.V[i];
+        C.V[i].cout_Vector();
+    }
+    return C;
+}
+
+Matrix Matrix::operator- () {
+    return *this * (-1);
+}
+
+Matrix Matrix::operator- (const Matrix& B) {
+    int m = this->m;
+    assert(m == B.m && n == B.n);
+    Matrix C = Matrix(m, n);
+    for (int i = 0; i < m; i++) {
+        C.V[i] = V[i] - B.V[i];
+    }
+    return C;
+}
+
+Vector Matrix::operator* (Vector& b) {
+    int n = this->n;
+    int m = this->m;
+    assert (b.get_N() == n);
+    Vector t = o(m);
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            t[i] = t[i] + V[i][j]*b[j];
+        }
+    }
+    return t;
+}
+
+Matrix Matrix::operator* (double a) {
+    int m = this->m;
+    Matrix C = Matrix(m, n);
+    for (int i = 0; i < m; i++) {
+        C.V[i] = a * V[i];
+    }
+    return C;
+}
+
+Matrix Matrix::operator* (Matrix& B) {
+    int m = this->m;
+    int n = this->n;
+    int m1 = B.m;
+    int n1 = B.n;
+    assert (n == m1);
+    Matrix T = Matrix(m, n1);
+    for (int i = 0; i < m; i++) {
+        T.V[i] = V[i] * B;
+    }
+    return T;
+}
+
+Matrix Matrix::operator/ (double a) {
+    return *this * (1.0/a);
+}
+
+Matrix Matrix::operator^ (const int n) {
+    assert (m == n);
+    Matrix C = *this;
+    if (n < 0) {
+        Matrix B = C.inverse();
+        C = B;
+        for (int i = n + 1; i < 0; i++) {
+            C = C*B;
+        }
+        return C;
+    }
+    if (n == 0) {
+        return E(n);
+    }
+    Matrix B = C;
+    for (int i = n - 1; i > 0; i--) {
+        C = C*B;
+    }
+    return C;
+}
+
+bool Matrix::operator== (const Matrix& B) {
+    int m = this->m;
+    bool q = true;
+    if (m == B.m) {
+        for (int i = 0; i < m; i++) {
+            q = q && (V[i] == B.V[i]);
+        }
+        return q;
+    }
+    return false;
+}
+
+bool Matrix::operator!= (const Matrix& B) {
+    return !(*this == B);
+}
+
+Matrix::~Matrix() {
+    for (auto begin = V, end = V + m; begin != end; ++begin) {
+        (begin)->~Vector();
+    }
+}
+
+Vector operator* (Vector& a, Matrix& B) {
+    int N = a.get_N();
+    int m = B.get_m();
+    int n = B.get_n();
+    assert (N == m);
+    Vector t = o(n);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            t[i] = t[i] + a[j] * B[j][i];
+        }
+    }
+    return t;
+}
+
+Matrix operator* (double a, Matrix& B) {
+    return B * a;
+}
+
+Matrix E(unsigned int n) {
     Matrix A = Matrix(n, n);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
@@ -152,9 +286,9 @@ Matrix E(int n) {
     return A;
 }
 
-Matrix O(int m, int n) {
+Matrix O(unsigned int m, unsigned int n) {
     Matrix A = Matrix(m, n);
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             A[i][j] = 0;
         }
@@ -162,9 +296,9 @@ Matrix O(int m, int n) {
     return A;
 }
 
-double tr(Matrix A) {
-    int n = A.GetM_n();
-    int m = A.GetM_m();
+double tr(Matrix& A) {
+    int n = A.get_n();
+    int m = A.get_m();
     assert (n == m);
     double x = 0;
     for (int i = 0; i < n; i++) {
@@ -174,8 +308,8 @@ double tr(Matrix A) {
 }
 
 double det(Matrix A) {
-    int n = A.GetM_n();
-    int m = A.GetM_m();
+    int n = A.get_n();
+    int m = A.get_m();
     double x = 1;
     if (n == m) {
         for (int j = 0; j < n; j++) {
@@ -188,7 +322,7 @@ double det(Matrix A) {
             }
             if (i != j) {
                 A.stringij(i, j);
-                x = x*(-1);
+                x = x * (-1);
             }
             x = x * A[j][j];
             A[j] = A[j]/A[j][j];
@@ -205,8 +339,8 @@ double det(Matrix A) {
 
 int rg(Matrix A) {
     int x = 0;
-    int n = A.GetM_n();
-    int m = A.GetM_m();
+    int n = A.get_n();
+    int m = A.get_m();
     for (int j = 0; j < n; j++) {
         int i = x;
         while (i < m && A[i][j] == 0) {
@@ -226,40 +360,49 @@ int rg(Matrix A) {
     return x;
 }
 
-Matrix SOL(Matrix A, Vector b) {
-    int n = A.GetM_n();
-    int m = A.GetM_m();
-    assert(b.Get_N() == m);
+Matrix SOL(Matrix& A, Vector& b) {
+    int N = b.get_N();
+    int n = A.get_n();
+    int m = A.get_m();
+    assert(N == m);
     Matrix B = Matrix(m,n+1);
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             B[i][j] = A[i][j];
         }
-        B[i][n+1] = b[i];
+        B[i][n] = b[i];
     }
+    B.cout_Matrix();
     int k = rg(A);
-    assert (k == rg(B));
+    int g = rg(B);
+    std::cout<<'\n';
+    std::cout<<k<<" "<<g;
+    std::cout<<'\n';
+    assert (k == g);
     int x = 0;
     int j = 0;
     Vector c = Vector(k);
     double t;
     while (x != k) {
         int i = x;
-        while (i < m && A[i][j] == 0) {
+        while (i < m && B[i][j] == 0) {
             i++;
         }
         if (i < m) {
-            t = b[i];
-            b[i] = b[x];
-            b[x] = t;
-            A.stringij(i, x);
-            b[x] = b[x]/A[x][j];
-            A[x] = A[x]/A[x][j];
+            if (i != x) {
+                t = b[i];
+                b[i] = b[x];
+                b[x] = t;
+            }
+            B.stringij(i, x);
+            B[x] = B[x]/B[x][j];
             i++;
             while (i < m) {
-                b[x] = b[i] - A[i][j]* b[x];
-                A[i] = A[i] - A[i][j]* A[x];
+                B[i] = B[i] - B[i][j]* B[x];
                 i++;
+            }
+            for (i = 0; i < x; i++) {
+                B[i] = B[i] - B[i][j]* B[x];
             }
             c[x] = j;
             x++;
@@ -267,13 +410,14 @@ Matrix SOL(Matrix A, Vector b) {
         j++;
     }
     for (int i = 0; i < k; i++) {
-        A.columnij(i, c[i]);
+        B.columnij(i, c[i]);
     }
+    B.cout_Matrix();
     int p = n-k+1;
     Matrix F = Matrix(n, p);
     for (int i = 0; i < n; i++) {
         if (i < k) {
-            F[i][0] = b[i];
+            F[i][0] = B[i][n];
         }
         else {
             F[i][0] = 0;
@@ -281,7 +425,7 @@ Matrix SOL(Matrix A, Vector b) {
     }
     for (int j = 1; j < p; j++) {
         for (int i = 0; i < k; i++) {
-            F[i][j] = -A[i][j+k];
+            F[i][j] = -B[i][j-1+k];
         }
         for (int i = k; i < n; i++) {
             if (j-1 == i-k) {
@@ -292,122 +436,8 @@ Matrix SOL(Matrix A, Vector b) {
             }
         }
     }
-    for (int i = n-1; i >=0; i--) {
+    for (int i = k-1; i >=0; i--) {
         F.stringij(i, c[i]);
     }
     return F;
-}
-
-Matrix operator+ (Matrix A, Matrix B) {
-    int x = A.GetM_m();
-    int y = B.GetM_m();
-    int x1 = A.GetM_n();
-    int y1 = B.GetM_n();
-    assert (x == y && x1 == y1);
-    Matrix C = Matrix(x, x1);
-    for (int i = 0; i < x; i++) {
-        C[i] = A[i] + B[i];
-    }
-    return C;
-}
-
-Matrix operator- (Matrix A, Matrix B) {
-    int x = A.GetM_m();
-    int y = B.GetM_m();
-    int x1 = A.GetM_n();
-    int y1 = B.GetM_n();
-    assert (x == y && x1 == y1);
-    Matrix C = Matrix(x, x1);
-    for (int i = 0; i < x; i++) {
-        C[i] = A[i] - B[i];
-    }
-    return C;
-}
-
-bool operator== (Matrix A, Matrix B) {
-    int x = A.GetM_m();
-    int y = B.GetM_m();
-    int x1 = A.GetM_n();
-    int y1 = B.GetM_n();
-    if (x == y && x1 == y1) {
-        bool q = true;
-        for (int i = 0; i < x; i++) {
-            q = q && (A[i] == B[i]);
-        }
-        return q;
-    }
-    return false;
-}
-
-Matrix operator* (double a, Matrix B) {
-    int x = B.GetM_m();
-    for (int i = 0; i < x; i++) {
-        B[i] = a*B[i];
-    }
-    return B;
-}
-
-Vector operator* (Vector a, Matrix B) {
-    int x = a.Get_N();
-    int y = B.GetM_m();
-    int z = B.GetM_n();
-    assert (x == y);
-    Vector t = o(z);
-    for (int i = 0; i < z; i++) {
-        for (int j = 0; j < y; j++) {
-            t[i] = t[i] + a[j]*B[j][i];
-        }
-    }
-    return t;
-}
-
-Vector operator* (Matrix A, Vector b) {
-    int x = b.Get_N();
-    int y = A.GetM_n();
-    int z = A.GetM_m();
-    assert (x == y);
-    Vector t = o(z);
-    for (int i = 0; i < z; i++) {
-        for (int j = 0; j < y; j++) {
-            t[i] = t[i] + A[i][j]*b[j];
-        }
-    }
-    return t;
-}
-
-Matrix operator* (Matrix A, Matrix B) {
-    int x = A.GetM_m();
-    int y = A.GetM_n();
-    int x1 = B.GetM_m();
-    int y1 = B.GetM_n();
-    assert (y == x1);
-    Matrix T = Matrix(x, y1);
-    for (int i = 0; i < x; i++) {
-        T[i] = A[i]*B;
-    }
-    return T;
-}
-
-Matrix operator/ (Matrix B, double a) {
-    return (1.0/a)*B;
-}
-
-Matrix operator^ (Matrix A, int n) {
-    assert (A.GetM_m() == A.GetM_n());
-    if (n < 0) {
-        Matrix B = A.inverse();
-        A = B;
-        for (int i = n + 1; i < 0; i++) {
-            A = A*B;
-        }
-        return A;
-    }
-    if (n == 0) {
-        return E(A.GetM_n());
-    }
-    Matrix B = A;
-    for (int i = n - 1; i > 0; i--) {
-        A = A*B;
-    }
-    return A;
 }
