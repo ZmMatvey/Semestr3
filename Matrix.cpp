@@ -147,12 +147,10 @@ Vector& Matrix::operator[] (unsigned int i) {
 
 Matrix Matrix::operator+ (const Matrix& B) {
     int m = this->m;
-    int n = this->n;
     assert(m == B.m && n == B.n);
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
         C.V[i] = V[i] + B.V[i];
-        C.V[i].cout_Vector();
     }
     return C;
 }
