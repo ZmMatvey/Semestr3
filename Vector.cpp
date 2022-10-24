@@ -2,11 +2,12 @@
 #include <assert.h>
 #include "Vector.h"
 
-Vector::Vector (): v(new double[3]), N(3) {}
+Vector::Vector(): v(new double[3]), N(3) {}
 
-Vector::Vector (int a): v(new double[a]), N(a) {}
+Vector::Vector(unsigned int a): v(new double[a]), N(a) {}
 
 Vector::Vector(const Vector& b): Vector(b.N) {
+    int N = this->N;
     for (int i = 0; i < N; i++) {
         v[i] = b.v[i];
     }
@@ -14,32 +15,40 @@ Vector::Vector(const Vector& b): Vector(b.N) {
 
 Vector::Vector(Vector&& b): N(b.N), v(b.v) {}
 
-int Vector::Get_N() {
+int Vector::get_N()const {
     return N;
 }
 
-void Vector::Set_fill() {
+double* Vector::get_v() {
+    return v;
+}
+
+void Vector::set_fill() {
+    int N = this->N;
     for (int i = 0; i < N; i++) {
         std::cin>>v[i];
     }
 }
 
-void Vector::Set_fill(double* x) {
+void Vector::set_fill(double* x) {
+    int N = this->N;
     for (int i = 0; i < N; i++) {
         v[i] = x[i];
     }
 }
 
-void Vector::Cout_Vector() {
+void Vector::cout_Vector() {
+    int P = this->N - 1;
     std::cout<<"||";
-    for (int i = 0; i < N-1; i++) {
+    for (int i = 0; i < P; i++) {
         std::cout<<v[i]<<" ";
     }
-    std::cout<<v[N-1];
+    std::cout<<v[P];
     std::cout<<"||"<<std::endl;
 }
 
 Vector& Vector::operator= (const Vector& b) {
+    int N = this->N;
     assert (N == b.N);
     if (this == &b) {
         return *this;
@@ -51,71 +60,81 @@ Vector& Vector::operator= (const Vector& b) {
 }
 
 Vector& Vector::operator= (Vector&& b) {
-    this->N = b.N;
-    this->v = b.v;
+    N = b.N;
+    v = b.v;
+    b.v = NULL;
     return *this;
 }
 
-Vector::~Vector () {
-    delete []v;
-}
-
-double& Vector::operator[](int i) {
+double& Vector::operator[](unsigned int i) {
     return v[i];
 }
 
-Vector o(int a) {
-    Vector c = Vector(a);
-    for (int i = 0; i < a; i++) {
-        c[i] = 0;
+Vector Vector::operator+ (const Vector& b) {
+    int N = this->N;
+    assert(N == b.N);
+    Vector c = Vector(N);
+    for (int i = 0; i < N; i++) {
+        c.v[i] = v[i] + b.v[i];
     }
     return c;
 }
 
-Vector operator+ (Vector a, Vector b){
-    int x = a.Get_N();
-    int y = b.Get_N();
-    assert (x == y);
-    Vector c = Vector(x);
-    for (int i = 0; i < x; i++) {
-        c[i] = a[i] + b[i];
+Vector Vector::operator- () {
+    return *this * (-1);
+}
+
+Vector Vector::operator- (const Vector& b) {
+    int N = this->N;
+    assert(N == b.N);
+    Vector c = Vector(N);
+    for (int i = 0; i < N; i++) {
+        c.v[i] = v[i] - b.v[i];
     }
     return c;
 }
 
-Vector operator- (Vector a, Vector b) {
-    int x = a.Get_N();
-    int y = b.Get_N();
-    assert (x == y);
-    Vector c = Vector(x);
-    for (int i = 0; i < x; i++) {
-        c[i] = a[i] - b[i];
+Vector Vector::operator* (double a) {
+    int N = this->N;
+    Vector c = Vector(N);
+    for (int i = 0; i < N; i++) {
+        c.v[i] = v[i] * a ;
     }
     return c;
 }
 
-bool operator== (Vector a, Vector b) {
-    int x = a.Get_N();
-    int y = b.Get_N();
-    if (x == y) {
-        bool q = true;
-        for (int i = 0; i < x; i++) {
-            q = q && (a[i] == b[i]);
+Vector Vector::operator/ (double a) {
+    return *this * (1.0/a);
+}
+
+bool Vector::operator== (const Vector& b) {
+    int N = this->N;
+    bool q = true;
+    if (N == b.N) {
+        for (int i = 0; i < N; i++) {
+            q = q && (v[i] == b.v[i]);
         }
         return q;
     }
     return false;
 }
 
-Vector operator* (double a, Vector b) {
-    int x = b.Get_N();
-    Vector c = Vector(x);
-    for (int i = 0; i < x; i++) {
-        c[i] = a*b[i];
-    }
-    return c;
+bool Vector::operator!= (const Vector& b) {
+    return !(*this == b);
 }
 
-Vector operator/ (Vector b, double a) {
-    return (1.0/a)*b;
+Vector::~Vector () {
+    delete []v;
+}
+
+Vector operator* (double a, Vector& b) {
+    return b * a;
+}
+
+Vector o(unsigned int a) {
+    Vector c = Vector(a);
+    for (int i = 0; i < a; i++) {
+        c[i] = 0;
+    }
+    return c;
 }
