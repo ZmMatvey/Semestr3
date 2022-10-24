@@ -64,7 +64,7 @@ void Matrix::columnij(unsigned int i, unsigned int j) {
     if (i != j) {
         int m = this->m;
         double c;
-        for (int t = 0; t < m; i++) {
+        for (int t = 0; t < m; t++) {
             c = V[t][i];
             V[t][i] = V[t][j];
             V[t][j] = c;
@@ -372,28 +372,18 @@ Matrix SOL(Matrix& A, Vector& b) {
         }
         B[i][n] = b[i];
     }
-    B.cout_Matrix();
     int k = rg(A);
     int g = rg(B);
-    std::cout<<'\n';
-    std::cout<<k<<" "<<g;
-    std::cout<<'\n';
     assert (k == g);
     int x = 0;
     int j = 0;
     Vector c = Vector(k);
-    double t;
     while (x != k) {
         int i = x;
         while (i < m && B[i][j] == 0) {
             i++;
         }
         if (i < m) {
-            if (i != x) {
-                t = b[i];
-                b[i] = b[x];
-                b[x] = t;
-            }
             B.stringij(i, x);
             B[x] = B[x]/B[x][j];
             i++;
@@ -412,7 +402,6 @@ Matrix SOL(Matrix& A, Vector& b) {
     for (int i = 0; i < k; i++) {
         B.columnij(i, c[i]);
     }
-    B.cout_Matrix();
     int p = n-k+1;
     Matrix F = Matrix(n, p);
     for (int i = 0; i < n; i++) {
