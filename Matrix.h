@@ -3,78 +3,84 @@
 class Matrix
 {
 protected:
-int m; //number of strings
+int m;//количество вектор строк
 
-int n; //number of columns
+int n;//количество вектор столбцов
 
-Vector* V; //pointer to an array of vector strings
+Vector* V;//указатель на массив вектор строк
 
 public:
 
-Matrix (int m, int n); //creates a matrix with m - strings, n - columns
+Matrix(unsigned int m, unsigned int n);//создаёт матрицу axb
 
-Matrix(const Matrix& B); //rule of five - 1 copy constructor
+Matrix(const Matrix& B);//правило пяти - 1 конструктор копирования
 
-Matrix(Matrix&& B); //rule of five - 2 move constructor
+Matrix(Matrix&& B);//правило пяти - 2 конструктор перемещения
 
-int GetM_m();
+int get_m()const;
 
-int GetM_n();
+int get_n()const;
 
-void SetM_fill(); //filling in the matrix manually
+Vector* get_V();
 
-void SetM_fill(Vector* X); //filling the matrix with an array of vectors
+void set_fill();//заполнение матрицы вручную
 
-void Cout_Matrix(); 
+void set_fill(Vector* X);//заполнение матрицы при помощи массива векторов
 
-void stringij(int i, int j); //swaps i, j string
+void cout_Matrix();//вывод матрицы
 
-void columnij(int i, int j); //swaps i, j columns element by element
-//therefore, it is better to use stringij whenever possible, the code will be faster
+void stringij(unsigned int i, unsigned int j);//меняет местами i, j строки
 
-Matrix T(); //transposed matrix
+void columnij(unsigned int i, unsigned int j);//меняет местами i, j столбцы
 
-Matrix inverse(); //inverse matrix
+Matrix T();//транспонированная матрица
 
-double xi(double x); //the characteristic polynomial of x
+Matrix inverse();//обратная матрица
 
-Matrix& operator= (const Matrix& B); //rule of five - 3 assignment operator
+double xi(double x);//характеристический многочлен от x
 
-Matrix& operator= (Matrix&& B); // rule of five - 4 move operator
+Matrix& operator= (const Matrix& B);//правило пяти - 3 оператор присваивания
 
-Vector& operator[] (int i);
+Matrix& operator= (Matrix&& B);//правило пяти - 4 оператор перемещения
 
-~Matrix (); //rule of five - 5 destructor
+Vector& operator[] (unsigned int i);
+
+Matrix operator+ (const Matrix& B);
+
+Matrix operator- ();
+
+Matrix operator- (const Matrix& B);
+
+Vector operator* (Vector& b);//умножение матрицы на вектор столбец
+
+Matrix operator* (double a);//умножение матрицы b на скаляр а
+
+Matrix operator* (Matrix& B);
+
+Matrix operator/ (double a);
+
+Matrix operator^ (int n);//A^n возведение матрицы в степень
+
+bool operator== (const Matrix& B);
+
+bool operator!= (const Matrix& B);
+
+~Matrix ();//правило пяти - 5 деструктор
 
 };
 
-Matrix E(int n); 
+Vector operator* (Vector& a, Matrix& B);//умножение вектор строки на матрицу
 
-Matrix O(int m, int n);
+Matrix operator* (double a, Matrix& B);//умножение матрицы b на скаляр а
 
-double tr(Matrix A);
+Matrix E(unsigned int n);//единичная матрица размера nxn
 
-double det(Matrix A);
+Matrix O(unsigned int m, unsigned int n);//нулевая матрица размерами mxn
 
-int rg(Matrix A);
+double tr(Matrix& A);//след матрицы A
 
-Matrix SOL(Matrix A, Vector b); //solutions of a linear matrix equation of the form A*x=b 
-//returns the matrix 1 column - a partial solution, the rest - the basis of solutions of a homogeneous equation
+double det(Matrix A);//определитель матрицы A
 
-Matrix operator+ (Matrix A, Matrix B); //A+B
+int rg(Matrix A);//ранг матрицы A
 
-Matrix operator- (Matrix A, Matrix B); //A-B
-
-bool operator== (Matrix A, Matrix B); //A == B
-
-Matrix operator* (double a, Matrix B); //multiplication of matrix b by scalar a
-
-Vector operator* (Vector a, Matrix B); //multiplying a matrix by a string vector
-
-Vector operator* (Matrix A, Vector b); //multiplying a matrix by a column vector
-
-Matrix operator* (Matrix A, Matrix B); // A*B
-
-Matrix operator/ (Matrix B, double a); // B/a
-
-Matrix operator^ (Matrix A, int n); //A^n exponentiation of the matrix
+Matrix SOL(Matrix A, Vector b);//решение линейного матричного уравнения вида A*x=b
