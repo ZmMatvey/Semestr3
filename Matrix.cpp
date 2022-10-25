@@ -1,9 +1,9 @@
 #include <iostream>
-#include <assert.h>
+#include <stdexcept>
 #include "Matrix.h"
 
 Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
-    void * memory = operator new (sizeof(Vector) * m);      //магия выделения памяти
+    void* memory = operator new (sizeof(Vector) * m);
     V = (Vector*)memory;
     for (auto begin = V, end = V + m; begin != end; ++begin) {
         new (begin) Vector(n);
@@ -17,7 +17,9 @@ Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
     }
 }
 
-Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), V(B.V) {}
+Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), V(B.V) {
+    B.V = NULL;
+}
 
 int Matrix::get_m()const {
     return m;
@@ -85,7 +87,9 @@ Matrix Matrix::T() {
 }
 
 Matrix Matrix::inverse() {
-    assert((int)(det(*this)*10000000)/10 != 0);
+    if((int)(det(*this)*10000000)/10 == 0) {
+        throw(std::runtime_error("det(Matrix) = 0, not inverse"));
+    }
     int n = this->n;
     Matrix X = E(n);
     Matrix A = *this;
@@ -116,14 +120,18 @@ Matrix Matrix::inverse() {
 }
 
 double Matrix::xi(double x) {
-    assert (n == m);
+    if (n != m) {
+        throw(std::runtime_error("the matrix has no characteristic polynomial"));
+    }
     return det((*this) - E(n) * x);
 }
 
 Matrix& Matrix::operator= (const Matrix& B) {
     int m = this->m;
     int n = this->n;
-    assert (m == B.m && n == B.n);
+    if (m != B.m || n != B.n) {
+        throw(std::runtime_error("= not correct, the sizes do not match"));
+    }
     if (this == &B) {
         return *this;
     }
@@ -134,10 +142,9 @@ Matrix& Matrix::operator= (const Matrix& B) {
 }
 
 Matrix& Matrix::operator= (Matrix&& B) {
-    m = B.m;
-    n = B.n;
-    V = B.V;
-    B.V = NULL;
+    std::swap(m, B.m);
+    std::swap(n, B.n);
+    std::swap(V, B.V);
     return *this;
 }
 
@@ -147,7 +154,10 @@ Vector& Matrix::operator[] (unsigned int i) {
 
 Matrix Matrix::operator+ (const Matrix& B) {
     int m = this->m;
-    assert(m == B.m && n == B.n);
+    int n = this->n;
+    if (m != B.m && n != B.n) {
+        throw(std::runtime_error("+ not correct, the sizes do not match"));
+    }
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
         C.V[i] = V[i] + B.V[i];
@@ -161,7 +171,10 @@ Matrix Matrix::operator- () {
 
 Matrix Matrix::operator- (const Matrix& B) {
     int m = this->m;
-    assert(m == B.m && n == B.n);
+    int n = this->n;
+    if (m != B.m && n != B.n) {
+        throw(std::runtime_error("- not correct, the sizes do not match"));
+    }
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
         C.V[i] = V[i] - B.V[i];
@@ -170,9 +183,11 @@ Matrix Matrix::operator- (const Matrix& B) {
 }
 
 Vector Matrix::operator* (Vector& b) {
-    int n = this->n;
     int m = this->m;
-    assert (b.get_N() == n);
+    int n = this->n;
+    if (b.get_N() != n) {
+        throw(std::runtime_error("Matrix*Vector not correct, the sizes do not match"));
+    }
     Vector t = o(m);
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
@@ -196,7 +211,9 @@ Matrix Matrix::operator* (Matrix& B) {
     int n = this->n;
     int m1 = B.m;
     int n1 = B.n;
-    assert (n == m1);
+    if (n != m1) {
+        throw(std::runtime_error("Matrix*Matrix not correct, the sizes do not match"));
+    }
     Matrix T = Matrix(m, n1);
     for (int i = 0; i < m; i++) {
         T.V[i] = V[i] * B;
@@ -209,7 +226,9 @@ Matrix Matrix::operator/ (double a) {
 }
 
 Matrix Matrix::operator^ (const int n) {
-    assert (m == n);
+    if (m != n) {
+        throw(std::runtime_error("Matrix^N not correct, the sizes do not match"));
+    }
     Matrix C = *this;
     if (n < 0) {
         Matrix B = C.inverse();
@@ -249,13 +268,16 @@ Matrix::~Matrix() {
     for (auto begin = V, end = V + m; begin != end; ++begin) {
         (begin)->~Vector();
     }
+    operator delete(V);
 }
 
 Vector operator* (Vector& a, Matrix& B) {
     int N = a.get_N();
     int m = B.get_m();
     int n = B.get_n();
-    assert (N == m);
+    if (N != m) {
+        throw(std::runtime_error("Vector*Matrix not correct, the sizes do not match"));
+    }
     Vector t = o(n);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
@@ -297,7 +319,9 @@ Matrix O(unsigned int m, unsigned int n) {
 double tr(Matrix& A) {
     int n = A.get_n();
     int m = A.get_m();
-    assert (n == m);
+    if (n != m) {
+        throw(std::runtime_error("tr(Matrix) not correct, the sizes do not match"));
+    }
     double x = 0;
     for (int i = 0; i < n; i++) {
         x = x + A[i][i];
@@ -341,7 +365,7 @@ int rg(Matrix A) {
     int m = A.get_m();
     for (int j = 0; j < n; j++) {
         int i = x;
-        while (i < m && (int)(A[i][j]*10000000) == 0) {
+        while (i < m && (int)(A[i][j]*10000000)/10 == 0) {
             i++;
         }
         if (i < m) {
@@ -362,7 +386,9 @@ Matrix SOL(Matrix& A, Vector& b) {
     int N = b.get_N();
     int n = A.get_n();
     int m = A.get_m();
-    assert(N == m);
+    if(N != m) {
+        throw(std::runtime_error("SOL not correct, the sizes do not match"));
+    }
     Matrix B = Matrix(m,n+1);
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
@@ -372,7 +398,9 @@ Matrix SOL(Matrix& A, Vector& b) {
     }
     int k = rg(A);
     int g = rg(B);
-    assert (k == g);
+    if (k != g) {
+        throw(std::runtime_error("SOL not correct, rg(A) != rg(A,b)"));
+    }
     int x = 0;
     int j = 0;
     Vector c = Vector(k);
