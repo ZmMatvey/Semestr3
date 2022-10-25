@@ -8,6 +8,22 @@ Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
     for (auto begin = V, end = V + m; begin != end; ++begin) {
         new (begin) Vector(n);
     }
+    if (n < 6)
+    R = 10000000;
+    else
+    if (n < 11)
+    R = 1000000;
+    else
+    if (n < 21)
+    R = 100000;
+    else
+    if (n < 41)
+    R = 10000;
+    else
+    if (n < 76)
+    R = 1000;
+    else
+    R = 100;
 }
 
 Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
@@ -27,6 +43,10 @@ int Matrix::get_m()const {
 
 int Matrix::get_n()const {
     return n;
+}
+
+int Matrix::get_R()const {
+    return R;
 }
 
 Vector* Matrix::get_V() {
@@ -87,7 +107,7 @@ Matrix Matrix::T() {
 }
 
 Matrix Matrix::inverse() {
-    if((int)(det(*this)*10000000)/10 == 0) {
+    if(det(*this) == 0) {
         throw(std::runtime_error("det(Matrix) = 0, not inverse"));
     }
     int n = this->n;
@@ -332,11 +352,12 @@ double tr(Matrix& A) {
 double det(Matrix A) {
     int n = A.get_n();
     int m = A.get_m();
+    int R = A.get_R();
     double x = 1;
     if (n == m) {
         for (int j = 0; j < n; j++) {
             int i = j;
-            while (i < n && A[i][j] == 0) {
+            while (i < n && (int)(A[i][j]*R)/10 == 0) {
                 i++;
             }
             if (i == n) {
@@ -363,9 +384,10 @@ int rg(Matrix A) {
     int x = 0;
     int n = A.get_n();
     int m = A.get_m();
+    int R = A.get_R();
     for (int j = 0; j < n; j++) {
         int i = x;
-        while (i < m && (int)(A[i][j]*10000000)/10 == 0) {
+        while (i < m && (int)(A[i][j]*R)/10 == 0) {
             i++;
         }
         if (i < m) {
