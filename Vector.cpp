@@ -1,5 +1,5 @@
 #include <iostream>
-#include <assert.h>
+#include <stdexcept>
 #include "Vector.h"
 
 Vector::Vector(): v(new double[3]), N(3) {}
@@ -13,7 +13,9 @@ Vector::Vector(const Vector& b): Vector(b.N) {
     }
 }
 
-Vector::Vector(Vector&& b): N(b.N), v(b.v) {}
+Vector::Vector(Vector&& b): N(b.N), v(b.v) {
+    b.v = NULL;
+}
 
 int Vector::get_N()const {
     return N;
@@ -49,7 +51,9 @@ void Vector::cout_Vector() {
 
 Vector& Vector::operator= (const Vector& b) {
     int N = this->N;
-    assert (N == b.N);
+    if (N != b.N) {
+        throw(std::runtime_error("=Vector not correct, the sizes do not match"));
+    }
     if (this == &b) {
         return *this;
     }
@@ -60,9 +64,8 @@ Vector& Vector::operator= (const Vector& b) {
 }
 
 Vector& Vector::operator= (Vector&& b) {
-    N = b.N;
-    v = b.v;
-    b.v = NULL;
+    std::swap(N, b.N);
+    std::swap(v, b.v);
     return *this;
 }
 
@@ -72,7 +75,9 @@ double& Vector::operator[](unsigned int i) {
 
 Vector Vector::operator+ (const Vector& b) {
     int N = this->N;
-    assert(N == b.N);
+    if (N != b.N) {
+        throw(std::runtime_error("Vector+Vector not correct, the sizes do not match"));
+    }
     Vector c = Vector(N);
     for (int i = 0; i < N; i++) {
         c.v[i] = v[i] + b.v[i];
@@ -86,7 +91,9 @@ Vector Vector::operator- () {
 
 Vector Vector::operator- (const Vector& b) {
     int N = this->N;
-    assert(N == b.N);
+    if (N != b.N) {
+        throw(std::runtime_error("Vector-Vector not correct, the sizes do not match"));
+    }
     Vector c = Vector(N);
     for (int i = 0; i < N; i++) {
         c.v[i] = v[i] - b.v[i];
