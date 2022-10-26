@@ -52,7 +52,7 @@ void Vector::cout_Vector() {
 Vector& Vector::operator= (const Vector& b) {
     int N = this->N;
     if (N != b.N) {
-        throw(std::runtime_error("=Vector not correct, the sizes do not match"));
+        throw(std::logic_error("=Vector not correct, the sizes do not match"));
     }
     if (this == &b) {
         return *this;
@@ -76,7 +76,7 @@ double& Vector::operator[](unsigned int i) {
 Vector Vector::operator+ (const Vector& b) {
     int N = this->N;
     if (N != b.N) {
-        throw(std::runtime_error("Vector+Vector not correct, the sizes do not match"));
+        throw(std::logic_error("Vector+Vector not correct, the sizes do not match"));
     }
     Vector c = Vector(N);
     for (int i = 0; i < N; i++) {
@@ -92,7 +92,7 @@ Vector Vector::operator- () {
 Vector Vector::operator- (const Vector& b) {
     int N = this->N;
     if (N != b.N) {
-        throw(std::runtime_error("Vector-Vector not correct, the sizes do not match"));
+        throw(std::logic_error("Vector-Vector not correct, the sizes do not match"));
     }
     Vector c = Vector(N);
     for (int i = 0; i < N; i++) {
