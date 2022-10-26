@@ -108,7 +108,7 @@ Matrix Matrix::T() {
 
 Matrix Matrix::inverse() {
     if(det(*this) == 0) {
-        throw(std::runtime_error("det(Matrix) = 0, not inverse"));
+        throw(std::logic_error("det(Matrix) = 0, not inverse"));
     }
     int n = this->n;
     Matrix X = E(n);
@@ -141,7 +141,7 @@ Matrix Matrix::inverse() {
 
 double Matrix::xi(double x) {
     if (n != m) {
-        throw(std::runtime_error("the matrix has no characteristic polynomial"));
+        throw(std::logic_error("the matrix has no characteristic polynomial"));
     }
     return det((*this) - E(n) * x);
 }
@@ -150,7 +150,7 @@ Matrix& Matrix::operator= (const Matrix& B) {
     int m = this->m;
     int n = this->n;
     if (m != B.m || n != B.n) {
-        throw(std::runtime_error("= not correct, the sizes do not match"));
+        throw(std::logic_error("= not correct, the sizes do not match"));
     }
     if (this == &B) {
         return *this;
@@ -176,7 +176,7 @@ Matrix Matrix::operator+ (const Matrix& B) {
     int m = this->m;
     int n = this->n;
     if (m != B.m && n != B.n) {
-        throw(std::runtime_error("+ not correct, the sizes do not match"));
+        throw(std::logic_error("+ not correct, the sizes do not match"));
     }
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
@@ -193,7 +193,7 @@ Matrix Matrix::operator- (const Matrix& B) {
     int m = this->m;
     int n = this->n;
     if (m != B.m && n != B.n) {
-        throw(std::runtime_error("- not correct, the sizes do not match"));
+        throw(std::logic_error("- not correct, the sizes do not match"));
     }
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
@@ -206,7 +206,7 @@ Vector Matrix::operator* (Vector& b) {
     int m = this->m;
     int n = this->n;
     if (b.get_N() != n) {
-        throw(std::runtime_error("Matrix*Vector not correct, the sizes do not match"));
+        throw(std::logic_error("Matrix*Vector not correct, the sizes do not match"));
     }
     Vector t = o(m);
     for (int i = 0; i < m; i++) {
@@ -232,7 +232,7 @@ Matrix Matrix::operator* (Matrix& B) {
     int m1 = B.m;
     int n1 = B.n;
     if (n != m1) {
-        throw(std::runtime_error("Matrix*Matrix not correct, the sizes do not match"));
+        throw(std::logic_error("Matrix*Matrix not correct, the sizes do not match"));
     }
     Matrix T = Matrix(m, n1);
     for (int i = 0; i < m; i++) {
@@ -247,7 +247,7 @@ Matrix Matrix::operator/ (double a) {
 
 Matrix Matrix::operator^ (const int n) {
     if (m != n) {
-        throw(std::runtime_error("Matrix^N not correct, the sizes do not match"));
+        throw(std::logic_error("Matrix^N not correct, the sizes do not match"));
     }
     Matrix C = *this;
     if (n < 0) {
@@ -296,7 +296,7 @@ Vector operator* (Vector& a, Matrix& B) {
     int m = B.get_m();
     int n = B.get_n();
     if (N != m) {
-        throw(std::runtime_error("Vector*Matrix not correct, the sizes do not match"));
+        throw(std::logic_error("Vector*Matrix not correct, the sizes do not match"));
     }
     Vector t = o(n);
     for (int i = 0; i < n; i++) {
@@ -340,7 +340,7 @@ double tr(Matrix& A) {
     int n = A.get_n();
     int m = A.get_m();
     if (n != m) {
-        throw(std::runtime_error("tr(Matrix) not correct, the sizes do not match"));
+        throw(std::logic_error("tr(Matrix) not correct, the sizes do not match"));
     }
     double x = 0;
     for (int i = 0; i < n; i++) {
@@ -409,7 +409,7 @@ Matrix SOL(Matrix& A, Vector& b) {
     int n = A.get_n();
     int m = A.get_m();
     if(N != m) {
-        throw(std::runtime_error("SOL not correct, the sizes do not match"));
+        throw(std::logic_error("SOL not correct, the sizes do not match"));
     }
     Matrix B = Matrix(m,n+1);
     for (int i = 0; i < m; i++) {
@@ -421,7 +421,7 @@ Matrix SOL(Matrix& A, Vector& b) {
     int k = rg(A);
     int g = rg(B);
     if (k != g) {
-        throw(std::runtime_error("SOL not correct, rg(A) != rg(A,b)"));
+        throw(std::logic_error("SOL not correct, rg(A) != rg(A,b)"));
     }
     int x = 0;
     int j = 0;
