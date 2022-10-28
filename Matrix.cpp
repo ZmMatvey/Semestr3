@@ -3,6 +3,7 @@
 #include "Matrix.h"
 
 Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
+    std::cout<<"costr"<<std::endl;
     void* memory = operator new (sizeof(Vector) * m);
     V = (Vector*)memory;
     for (auto begin = V, end = V + m; begin != end; ++begin) {
@@ -33,7 +34,8 @@ Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
     }
 }
 
-Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), V(B.V) {
+Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), R(B.R), V(B.V) {
+    B.m = 0;
     B.V = NULL;
 }
 
@@ -164,6 +166,7 @@ Matrix& Matrix::operator= (const Matrix& B) {
 Matrix& Matrix::operator= (Matrix&& B) {
     std::swap(m, B.m);
     std::swap(n, B.n);
+    std::swap(R, B.R);
     std::swap(V, B.V);
     return *this;
 }
