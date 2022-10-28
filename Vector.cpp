@@ -2,18 +2,18 @@
 #include <stdexcept>
 #include "Vector.h"
 
-Vector::Vector(): v(new double[3]), N(3) {}
+Vector::Vector() : v(new double[3]), N(3) {}
 
-Vector::Vector(unsigned int a): v(new double[a]), N(a) {}
+Vector::Vector(unsigned int a) : v(new double[a]), N(a) {}
 
-Vector::Vector(const Vector& b): Vector(b.N) {
+Vector::Vector(const Vector& b) : Vector(b.N) {
     int N = this->N;
     for (int i = 0; i < N; i++) {
         v[i] = b.v[i];
     }
 }
 
-Vector::Vector(Vector&& b): N(b.N), v(b.v) {
+Vector::Vector(Vector&& b) : N(b.N), v(b.v) {
     b.v = NULL;
 }
 
@@ -28,7 +28,7 @@ double* Vector::get_v() {
 void Vector::set_fill() {
     int N = this->N;
     for (int i = 0; i < N; i++) {
-        std::cin>>v[i];
+        std::cin >> v[i];
     }
 }
 
@@ -41,12 +41,12 @@ void Vector::set_fill(double* x) {
 
 void Vector::cout_Vector() {
     int P = this->N - 1;
-    std::cout<<"||";
+    std::cout << "||";
     for (int i = 0; i < P; i++) {
-        std::cout<<v[i]<<" ";
+        std::cout << v[i] << " ";
     }
-    std::cout<<v[P];
-    std::cout<<"||"<<std::endl;
+    std::cout << v[P];
+    std::cout << "||" << std::endl;
 }
 
 Vector& Vector::operator= (const Vector& b) {
@@ -105,13 +105,13 @@ Vector Vector::operator* (double a) {
     int N = this->N;
     Vector c = Vector(N);
     for (int i = 0; i < N; i++) {
-        c.v[i] = v[i] * a ;
+        c.v[i] = v[i] * a;
     }
     return c;
 }
 
 Vector Vector::operator/ (double a) {
-    return *this * (1.0/a);
+    return *this * (1.0 / a);
 }
 
 bool Vector::operator== (const Vector& b) {
@@ -130,7 +130,8 @@ bool Vector::operator!= (const Vector& b) {
     return !(*this == b);
 }
 
-Vector::~Vector () {
+Vector::~Vector()
+{
     delete []v;
 }
 
