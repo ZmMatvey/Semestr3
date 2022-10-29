@@ -3,7 +3,6 @@
 #include "Matrix.h"
 
 Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
-    std::cout<<"costr"<<std::endl;
     void* memory = operator new (sizeof(Vector) * m);
     V = (Vector*)memory;
     for (auto begin = V, end = V + m; begin != end; ++begin) {
