@@ -32,13 +32,6 @@ void Vector::set_fill() {
     }
 }
 
-void Vector::set_fill(double* x) {
-    int N = this->N;
-    for (int i = 0; i < N; i++) {
-        v[i] = x[i];
-    }
-}
-
 void Vector::cout_Vector() {
     int P = this->N - 1;
     std::cout << "||";
@@ -66,6 +59,44 @@ Vector& Vector::operator= (const Vector& b) {
 Vector& Vector::operator= (Vector&& b) {
     std::swap(N, b.N);
     std::swap(v, b.v);
+    return *this;
+}
+
+Vector& Vector::operator+= (const Vector& b) {
+    int N = this->N;
+    if (N != b.N) {
+        throw(std::logic_error("Vector+Vector not correct, the sizes do not match"));
+    }
+    for (int i = 0; i < N; i++) {
+        v[i] += b.v[i];
+    }
+    return *this;
+}
+
+Vector& Vector::operator-= (const Vector& b) {
+    int N = this->N;
+    if (N != b.N) {
+        throw(std::logic_error("Vector+Vector not correct, the sizes do not match"));
+    }
+    for (int i = 0; i < N; i++) {
+        v[i] -= b.v[i];
+    }
+    return *this;
+}
+
+Vector& Vector::operator*= (double b) {
+    int N = this->N;
+    for (int i = 0; i < N; i++) {
+        v[i] *= b;
+    }
+    return *this;
+}
+
+Vector& Vector::operator/= (double b) {
+    int N = this->N;
+    for (int i = 0; i < N; i++) {
+        v[i] /= b;
+    }
     return *this;
 }
 
