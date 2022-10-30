@@ -1,51 +1,57 @@
 class Vector
 {
 protected:
-int N;//размер вектора
+	int N;//размер вектора
 
-double* v;
+	double* v;
 
 public:
 
-Vector();
+	Vector();
 
-Vector(const Vector& b);//правило пяти 1-конструктор копирования
+	Vector(const Vector& b);//правило пяти 1-конструктор копирования
 
-Vector(Vector&& b);//правило пяти 2-конструктор перемещения
+	Vector(Vector&& b);//правило пяти 2-конструктор перемещения
 
-Vector(unsigned int a);//создаёт вектор из R^a
+	Vector(unsigned int a);//создаёт вектор из R^a
 
-int get_N()const;
+	int get_N()const;
 
-double* get_v();
+	double* get_v();
 
-void set_fill();//заполнение вектора вручную
+	void set_fill();//заполнение вектора вручную
 
-void set_fill(double* x);//заполнение вектора при помощи массива
+	void cout_Vector();//вывод вектора
 
-void cout_Vector();//вывод вектора
+	Vector& operator= (const Vector& b);//правило пяти 3-оператор присваивания
 
-Vector& operator= (const Vector& b);//правило пяти 3-оператор присваивания
+	Vector& operator= (Vector&& b);//правило пяти 4-оператор перемещения
 
-Vector& operator= (Vector&& b);//правило пяти 4-оператор перемещения
+	Vector& operator+= (const Vector& b);
 
-double& operator[] (unsigned int i);
+	Vector& operator-= (const Vector& b);
 
-Vector operator+ (const Vector& b);
+	Vector& operator*= (double b);
 
-Vector operator- ();
+	Vector& operator/= (double b);
 
-Vector operator- (const Vector& b);
+	double& operator[] (unsigned int i);
 
-Vector operator* (double a);//умножение вектора b на скаляр а
+	Vector operator+ (const Vector& b);
 
-Vector operator/ (double a);
+	Vector operator- ();
 
-bool operator== (const Vector& b);
+	Vector operator- (const Vector& b);
 
-bool operator!= (const Vector& b);
+	Vector operator* (double a);//умножение вектора b на скаляр а
 
-~Vector();//правило пяти 5-деструктор
+	Vector operator/ (double a);
+
+	bool operator== (const Vector& b);
+
+	bool operator!= (const Vector& b);
+
+	~Vector();//правило пяти 5-деструктор
 
 };
 
