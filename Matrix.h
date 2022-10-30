@@ -45,13 +45,13 @@ public:
 
 	Matrix& operator= (Matrix&& B);//правило пяти - 4 оператор перемещения
 
-	Matrix& operator+= (const Matrix& B)
+	Matrix& operator+= (const Matrix& B);
 
-	Matrix& operator-= (const Matrix& B)
+	Matrix& operator-= (const Matrix& B);
 
-	Matrix& operator*= (double a)
+	Matrix& operator*= (double a);
 
-	Matrix& operator/= (double a)
+	Matrix& operator/= (double a);
 
 	Vector& operator[] (unsigned int i);
 
