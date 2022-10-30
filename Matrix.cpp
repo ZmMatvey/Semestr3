@@ -404,7 +404,7 @@ double det(Matrix A) {
                 x = -x;
             }
             x *= A[j][j];
-            A[j] = A[j]/A[j][j];
+            A[j] /= A[j][j];
             i++;
             while (i < n) {
                 A[i] -= A[i][j]* A[j];
