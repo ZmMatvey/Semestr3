@@ -62,13 +62,6 @@ void Matrix::set_fill() {
     std::cout<<'\n';
 }
 
-void Matrix::set_fill(Vector* X) {
-    int m = this->m;
-    for (int i = 0; i < m; i++) {
-        V[i] = X[i];
-    }
-}
-
 void Matrix::cout_Matrix() {
     int m = this->m;
     for (int i = 0; i < m; i++) {
@@ -121,19 +114,19 @@ Matrix Matrix::inverse() {
         }
         X.stringij(i, j);
         A.stringij(i, j);
-        X.V[j] = X.V[j]/A.V[j][j];
-        A.V[j] = A.V[j]/A.V[j][j];
+        X.V[j] /= A.V[j][j];
+        A.V[j] /= A.V[j][j];
         i++;
         while (i < n) {
-            X.V[i] = X.V[i] - A.V[i][j] * X.V[j];
-            A.V[i] = A.V[i] - A.V[i][j] * A.V[j];
+            X.V[i] -= A.V[i][j] * X.V[j];
+            A.V[i] -= A.V[i][j] * A.V[j];
             i++;
         }
     }
     for (int j = n - 1; j > 0; j--) {
         int i = j - 1;
         while (i >= 0) {
-            X.V[i] = X.V[i] - A.V[i][j] * X.V[j];
+            X.V[i] -= A.V[i][j] * X.V[j];
             i--;
         }
     }
@@ -170,6 +163,40 @@ Matrix& Matrix::operator= (Matrix&& B) {
     return *this;
 }
 
+Matrix& Matrix::operator+= (const Matrix& B) {
+    if (m != B.m && n != B.n) {
+        throw(std::logic_error("+= not correct, the sizes do not match"));
+    }
+    for (int i = 0; i < m; i++) {
+        V[i] += B.V[i];
+    }
+    return *this;
+}
+
+Matrix& Matrix::operator-= (const Matrix& B) {
+    if (m != B.m && n != B.n) {
+        throw(std::logic_error("-= not correct, the sizes do not match"));
+    }
+    for (int i = 0; i < m; i++) {
+        V[i] -= B.V[i];
+    }
+    return *this;
+}
+
+Matrix& Matrix::operator*= (double a) {
+    for (int i = 0; i < m; i++) {
+        V[i] *= a;
+    }
+    return *this;
+}
+
+Matrix& Matrix::operator/= (double a) {
+    for (int i = 0; i < m; i++) {
+        V[i] /= a;
+    }
+    return *this;
+}
+
 Vector& Matrix::operator[] (unsigned int i) {
     return V[i];
 }
@@ -182,7 +209,8 @@ Matrix Matrix::operator+ (const Matrix& B) {
     }
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
-        C.V[i] = V[i] + B.V[i];
+        C.V[i] = V[i];
+        C.V[i] += B.V[i];
     }
     return C;
 }
@@ -199,7 +227,8 @@ Matrix Matrix::operator- (const Matrix& B) {
     }
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
-        C.V[i] = V[i] - B.V[i];
+        C.V[i] = V[i];
+        C.V[i] -= B.V[i];
     }
     return C;
 }
@@ -213,7 +242,7 @@ Vector Matrix::operator* (Vector& b) {
     Vector t = o(m);
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
-            t[i] = t[i] + V[i][j]*b[j];
+            t[i] += V[i][j]*b[j];
         }
     }
     return t;
@@ -223,7 +252,8 @@ Matrix Matrix::operator* (double a) {
     int m = this->m;
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
-        C.V[i] = a * V[i];
+        C.V[i] = V[i];
+        C.V[i] *= a;
     }
     return C;
 }
@@ -236,9 +266,13 @@ Matrix Matrix::operator* (Matrix& B) {
     if (n != m1) {
         throw(std::logic_error("Matrix*Matrix not correct, the sizes do not match"));
     }
-    Matrix T = Matrix(m, n1);
+    Matrix T = O(m, n1);
     for (int i = 0; i < m; i++) {
-        T.V[i] = V[i] * B;
+        for (int j = 0; j < n1; j++) {
+            for (int k = 0; k < n; k++) {
+                T.V[i][j] += V[i][k] * B.V[k][j];
+            }
+        }
     }
     return T;
 }
@@ -303,7 +337,7 @@ Vector operator* (Vector& a, Matrix& B) {
     Vector t = o(n);
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < m; j++) {
-            t[i] = t[i] + a[j] * B[j][i];
+            t[i] += a[j] * B[j][i];
         }
     }
     return t;
@@ -346,7 +380,7 @@ double tr(Matrix& A) {
     }
     double x = 0;
     for (int i = 0; i < n; i++) {
-        x = x + A[i][i];
+        x += A[i][i];
     }
     return x;
 }
@@ -367,13 +401,13 @@ double det(Matrix A) {
             }
             if (i != j) {
                 A.stringij(i, j);
-                x = x * (-1);
+                x = -x;
             }
-            x = x * A[j][j];
+            x *= A[j][j];
             A[j] = A[j]/A[j][j];
             i++;
             while (i < n) {
-                A[i] = A[i] - A[i][j]* A[j];
+                A[i] -= A[i][j]* A[j];
                 i++;
             }
         }
@@ -394,10 +428,10 @@ int rg(Matrix A) {
         }
         if (i < m) {
             A.stringij(i, x);
-            A[x] = A[x]/A[x][j];
+            A[x] /= A[x][j];
             i++ ;
             while (i < m) {
-                A[i] = A[i] - A[i][j]* A[x];
+                A[i] -= A[i][j]* A[x];
                 i++;
             }
             x++;
@@ -435,14 +469,14 @@ Matrix SOL(Matrix& A, Vector& b) {
         }
         if (i < m) {
             B.stringij(i, x);
-            B[x] = B[x]/B[x][j];
+            B[x] /= B[x][j];
             i++;
             while (i < m) {
-                B[i] = B[i] - B[i][j]* B[x];
+                B[i] -= B[i][j]* B[x];
                 i++;
             }
             for (i = 0; i < x; i++) {
-                B[i] = B[i] - B[i][j]* B[x];
+                B[i] -= B[i][j]* B[x];
             }
             c[x] = j;
             x++;
