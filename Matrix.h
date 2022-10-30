@@ -3,73 +3,79 @@
 class Matrix
 {
 protected:
-int m;//количество вектор строк
+	int m;//количество вектор строк
 
-int n;//количество вектор столбцов
+	int n;//количество вектор столбцов
 
-int R;//точность матрицы (сколько нулей в R, столько и цифр после запятой может стоять в элементе матрицы при вычислении rg, det, SOL)
+	int R;//точность матрицы (сколько нулей в R, столько и цифр после запятой может стоять в элементе матрицы при вычислении rg, det, SOL)
 
-Vector* V;//указатель на массив вектор строк
+	Vector* V;//указатель на массив вектор строк
 
 public:
 
-Matrix(unsigned int m, unsigned int n);//создаёт матрицу axb
+	Matrix(unsigned int m, unsigned int n);//создаёт матрицу axb
 
-Matrix(const Matrix& B);//правило пяти - 1 конструктор копирования
+	Matrix(const Matrix& B);//правило пяти - 1 конструктор копирования
 
-Matrix(Matrix&& B);//правило пяти - 2 конструктор перемещения
+	Matrix(Matrix&& B);//правило пяти - 2 конструктор перемещения
 
-int get_m()const;
+	int get_m()const;
 
-int get_n()const;
+	int get_n()const;
 
-int get_R()const;
+	int get_R()const;
 
-Vector* get_V();
+	Vector* get_V();
 
-void set_fill();//заполнение матрицы вручную
+	void set_fill();//заполнение матрицы вручную
 
-void set_fill(Vector* X);//заполнение матрицы при помощи массива векторов
+	void cout_Matrix();//вывод матрицы
 
-void cout_Matrix();//вывод матрицы
+	void stringij(unsigned int i, unsigned int j);//меняет местами i, j строки
 
-void stringij(unsigned int i, unsigned int j);//меняет местами i, j строки
+	void columnij(unsigned int i, unsigned int j);//меняет местами i, j столбцы
 
-void columnij(unsigned int i, unsigned int j);//меняет местами i, j столбцы
+	Matrix T();//транспонированная матрица
 
-Matrix T();//транспонированная матрица
+	Matrix inverse();//обратная матрица
 
-Matrix inverse();//обратная матрица
+	double xi(double x);//характеристический многочлен от x
 
-double xi(double x);//характеристический многочлен от x
+	Matrix& operator= (const Matrix& B);//правило пяти - 3 оператор присваивания
 
-Matrix& operator= (const Matrix& B);//правило пяти - 3 оператор присваивания
+	Matrix& operator= (Matrix&& B);//правило пяти - 4 оператор перемещения
 
-Matrix& operator= (Matrix&& B);//правило пяти - 4 оператор перемещения
+	Matrix& operator+= (const Matrix& B)
 
-Vector& operator[] (unsigned int i);
+	Matrix& operator-= (const Matrix& B)
 
-Matrix operator+ (const Matrix& B);
+	Matrix& operator*= (double a)
 
-Matrix operator- ();
+	Matrix& operator/= (double a)
 
-Matrix operator- (const Matrix& B);
+	Vector& operator[] (unsigned int i);
 
-Vector operator* (Vector& b);//умножение матрицы на вектор столбец
+	Matrix operator+ (const Matrix& B);
 
-Matrix operator* (double a);//умножение матрицы b на скаляр а
+	Matrix operator- ();
 
-Matrix operator* (Matrix& B);
+	Matrix operator- (const Matrix& B);
 
-Matrix operator/ (double a);
+	Vector operator* (Vector& b);//умножение матрицы на вектор столбец
 
-Matrix operator^ (int n);//A^n возведение матрицы в степень
+	Matrix operator* (double a);//умножение матрицы b на скаляр а
 
-bool operator== (const Matrix& B);
+	Matrix operator* (Matrix& B);
 
-bool operator!= (const Matrix& B);
+	Matrix operator/ (double a);
 
-~Matrix ();//правило пяти - 5 деструктор
+	Matrix operator^ (int n);//A^n возведение матрицы в степень
+
+	bool operator== (const Matrix& B);
+
+	bool operator!= (const Matrix& B);
+
+	~Matrix();//правило пяти - 5 деструктор
 
 };
 
