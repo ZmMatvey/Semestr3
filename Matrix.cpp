@@ -493,17 +493,18 @@ Matrix SOL(Matrix& A, Vector& b) {
         throw(std::logic_error("SOL not correct, the sizes do not match"));
     }
     Matrix B = Matrix(m, n + 1);
-    std::thread th([&A, &B, &b, m, n]() {
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                B[i][j] = A[i][j];
-            }
-            B[i][n] = b[i];
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            B[i][j] = A[i][j];
         }
+        B[i][n] = b[i];
+    }
+    int k;
+    std::thread th([&A, &k]() {
+        k = rg(A);
     });
-    int k = rg(A);
-    th.join();
     int g = rg(B);
+    th.join();
     if (k != g) {
         throw(std::logic_error("SOL not correct, rg(A) != rg(A,b)"));
     }
@@ -562,4 +563,3 @@ Matrix SOL(Matrix& A, Vector& b) {
     }
     return F;
 }
-
