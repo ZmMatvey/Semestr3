@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept>
+#include <thread>
 #include "Matrix.h"
 
 Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
@@ -267,10 +268,54 @@ Matrix Matrix::operator* (Matrix& B) {
         throw(std::logic_error("Matrix*Matrix not correct, the sizes do not match"));
     }
     Matrix T = O(m, n1);
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n1; j++) {
-            for (int k = 0; k < n; k++) {
-                T.V[i][j] += V[i][k] * B.V[k][j];
+    if (m > 3) {
+        std::thread a = std::thread([m, n, n1, &T, &B, this]() {
+            for (int i = 0; i < m / 4; i++) {
+                for (int j = 0; j < n1; j++) {
+                    for (int k = 0; k < n; k++) {
+                        T.V[i][j] += V[i][k] * B.V[k][j];
+                    }
+                }
+            }
+            });
+        std::thread b = std::thread([m, n, n1, &T, &B, this]() {
+            for (int i = m / 4; i < m / 2; i++) {
+                for (int j = 0; j < n1; j++) {
+                    for (int k = 0; k < n; k++) {
+                        T.V[i][j] += V[i][k] * B.V[k][j];
+                    }
+                }
+            }
+            });
+        std::thread c = std::thread([m, n, n1, &T, &B, this]() {
+            for (int i = m / 2; i < 3 * m / 4; i++) {
+                for (int j = 0; j < n1; j++) {
+                    for (int k = 0; k < n; k++) {
+                        T.V[i][j] += V[i][k] * B.V[k][j];
+                    }
+                }
+            }
+            });
+        std::thread d = std::thread([m, n, n1, &T, &B, this]() {
+            for (int i = 3 * m / 4; i < m; i++) {
+                for (int j = 0; j < n1; j++) {
+                    for (int k = 0; k < n; k++) {
+                        T.V[i][j] += V[i][k] * B.V[k][j];
+                    }
+                }
+            }
+            });
+        a.join();
+        b.join();
+        c.join();
+        d.join();
+    }
+    else {
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n1; j++) {
+                for (int k = 0; k < n; k++) {
+                    T.V[i][j] += V[i][k] * B.V[k][j];
+                }
             }
         }
     }
@@ -281,7 +326,7 @@ Matrix Matrix::operator/ (double a) {
     return *this * (1.0/a);
 }
 
-Matrix Matrix::operator^ (const int n) {
+Matrix Matrix::operator^ (int n) {
     if (m != n) {
         throw(std::logic_error("Matrix^N not correct, the sizes do not match"));
     }
@@ -447,14 +492,17 @@ Matrix SOL(Matrix& A, Vector& b) {
     if(N != m) {
         throw(std::logic_error("SOL not correct, the sizes do not match"));
     }
-    Matrix B = Matrix(m,n+1);
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            B[i][j] = A[i][j];
+    Matrix B = Matrix(m, n + 1);
+    std::thread th([&A, &B, &b, m, n]() {
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                B[i][j] = A[i][j];
+            }
+            B[i][n] = b[i];
         }
-        B[i][n] = b[i];
-    }
+    });
     int k = rg(A);
+    th.join();
     int g = rg(B);
     if (k != g) {
         throw(std::logic_error("SOL not correct, rg(A) != rg(A,b)"));
@@ -514,3 +562,4 @@ Matrix SOL(Matrix& A, Vector& b) {
     }
     return F;
 }
+
