@@ -1,7 +1,10 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
 class Vector
 {
-protected:
-	int N;//размер вектора
+private:
+	int size;//размер вектора
 
 	double* v;
 
@@ -15,13 +18,11 @@ public:
 
 	Vector(unsigned int a);//создаёт вектор из R^a
 
-	int get_N()const;
+	int get_size() const;
 
-	double* get_v();
+	void fill_Vector();//заполнение вектора вручную
 
-	void set_fill();//заполнение вектора вручную
-
-	void cout_Vector();//вывод вектора
+	void print_Vector() const;//вывод вектора
 
 	Vector& operator= (const Vector& b);//правило пяти 3-оператор присваивания
 
@@ -37,24 +38,26 @@ public:
 
 	double& operator[] (unsigned int i);
 
-	Vector operator+ (const Vector& b);
+	Vector operator+ (const Vector& b) const;
 
-	Vector operator- ();
+	Vector operator- () const;
 
-	Vector operator- (const Vector& b);
+	Vector operator- (const Vector& b) const;
 
-	Vector operator* (double a);//умножение вектора b на скаляр а
+	Vector operator* (double a) const ;//умножение вектора b на скаляр а
 
-	Vector operator/ (double a);
+	Vector operator/ (double a) const;
 
-	bool operator== (const Vector& b);
+	bool operator== (const Vector& b) const;
 
-	bool operator!= (const Vector& b);
+	bool operator!= (const Vector& b) const;
 
 	~Vector();//правило пяти 5-деструктор
 
 };
 
-Vector operator* (double a, Vector& b);
+Vector operator* (double a, const Vector& b);
 
 Vector o(unsigned int a);//нулевой вектор
+
+#endif //VECTOR_H
