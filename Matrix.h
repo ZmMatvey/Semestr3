@@ -1,14 +1,15 @@
-#pragma once
+#ifndef MATRIX_H
 #include "Vector.h"
+#define MATRIX_H
 
 class Matrix
 {
-protected:
+private:
 	int m;//количество вектор строк
 
 	int n;//количество вектор столбцов
 
-	int R;//точность матрицы (сколько нулей в R, столько и цифр после запятой может стоять в элементе матрицы при вычислении rg, det, SOL)
+	int accuracy;//точность матрицы (сколько нулей в R, столько и цифр после запятой может стоять в элементе матрицы при вычислении rg, det, SOL)
 
 	Vector* V;//указатель на массив вектор строк
 
@@ -20,27 +21,25 @@ public:
 
 	Matrix(Matrix&& B);//правило пяти - 2 конструктор перемещения
 
-	int get_m()const;
+	int get_m() const;
 
-	int get_n()const;
+	int get_n() const;
 
-	int get_R()const;
+	int get_accuracy() const;
 
-	Vector* get_V();
+	void fill_Matrix();//заполнение матрицы вручную
 
-	void set_fill();//заполнение матрицы вручную
-
-	void cout_Matrix();//вывод матрицы
+	void print_Matrix() const;//вывод матрицы
 
 	void stringij(unsigned int i, unsigned int j);//меняет местами i, j строки
 
 	void columnij(unsigned int i, unsigned int j);//меняет местами i, j столбцы
 
-	Matrix T();//транспонированная матрица
+	Matrix T() const;//транспонированная матрица
 
-	Matrix inverse();//обратная матрица
+	Matrix inverse() const;//обратная матрица
 
-	double xi(double x);//характеристический многочлен от x
+	double xi(double x) const;//характеристический многочлен от x
 
 	Matrix& operator= (const Matrix& B);//правило пяти - 3 оператор присваивания
 
@@ -56,33 +55,33 @@ public:
 
 	Vector& operator[] (unsigned int i);
 
-	Matrix operator+ (const Matrix& B);
+	Matrix operator+ (const Matrix& B) const;
 
-	Matrix operator- ();
+	Matrix operator- () const;
 
-	Matrix operator- (const Matrix& B);
+	Matrix operator- (const Matrix& B) const;
 
-	Vector operator* (Vector& b);//умножение матрицы на вектор столбец
+	Vector operator* (Vector& b) const;//умножение матрицы на вектор столбец
 
-	Matrix operator* (double a);//умножение матрицы b на скаляр а
+	Matrix operator* (double a) const;//умножение матрицы b на скаляр а
 
-	Matrix operator* (Matrix& B);
+	Matrix operator* (const Matrix& B) const;
 
-	Matrix operator/ (double a);
+	Matrix operator/ (double a) const;
 
-	Matrix operator^ (int n);//A^n возведение матрицы в степень
+	Matrix operator^ (int n) const;//A^n возведение матрицы в степень
 
-	bool operator== (const Matrix& B);
+	bool operator== (const Matrix& B) const;
 
-	bool operator!= (const Matrix& B);
+	bool operator!= (const Matrix& B) const;
 
 	~Matrix();//правило пяти - 5 деструктор
 
 };
 
-Vector operator* (Vector& a, Matrix& B);//умножение вектор строки на матрицу
+Matrix operator* (double a, const Matrix& B);//умножение матрицы b на скаляр а
 
-Matrix operator* (double a, Matrix& B);//умножение матрицы b на скаляр а
+Matrix operator* (Vector& a, const Matrix& B);//умножение вектор строки на матрицу
 
 Matrix E(unsigned int n);//единичная матрица размера nxn
 
@@ -95,3 +94,5 @@ double det(Matrix A);//определитель матрицы A
 int rg(Matrix A);//ранг матрицы A
 
 Matrix SOL(Matrix& A, Vector& b);//решение линейного матричного уравнения вида A*x=b
+
+#endif // MATRIX_H
