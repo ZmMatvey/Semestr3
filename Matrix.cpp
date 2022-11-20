@@ -10,21 +10,21 @@ Matrix::Matrix (unsigned int m, unsigned int n): m(m), n(n) {
         new (begin) Vector(n);
     }
     if (n < 6)
-    R = 10000000;
+        accuracy = 10000000;
     else
     if (n < 11)
-    R = 1000000;
+        accuracy = 1000000;
     else
     if (n < 21)
-    R = 100000;
+        accuracy = 100000;
     else
     if (n < 41)
-    R = 10000;
+        accuracy = 10000;
     else
     if (n < 76)
-    R = 1000;
+        accuracy = 1000;
     else
-    R = 100;
+        accuracy = 100;
 }
 
 Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
@@ -34,39 +34,35 @@ Matrix::Matrix(const Matrix& B): Matrix(B.m, B.n)  {
     }
 }
 
-Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), R(B.R), V(B.V) {
+Matrix::Matrix(Matrix&& B): m(B.m), n(B.n), accuracy(B.accuracy), V(B.V) {
     B.m = 0;
     B.V = NULL;
 }
 
-int Matrix::get_m()const {
+int Matrix::get_m() const {
     return m;
 }
 
-int Matrix::get_n()const {
+int Matrix::get_n() const {
     return n;
 }
 
-int Matrix::get_R()const {
-    return R;
+int Matrix::get_accuracy() const {
+    return accuracy;
 }
 
-Vector* Matrix::get_V() {
-    return V;
-}
-
-void Matrix::set_fill() {
+void Matrix::fill_Matrix() {
     int m = this->m;
     for (int i = 0; i < m; i++) {
-        V[i].set_fill();
+        V[i].fill_Vector();
     }
     std::cout<<'\n';
 }
 
-void Matrix::cout_Matrix() {
+void Matrix::print_Matrix() const {
     int m = this->m;
     for (int i = 0; i < m; i++) {
-        V[i].cout_Vector();
+        V[i].print_Vector();
     }
     std::cout<<'\n';
 }
@@ -89,7 +85,7 @@ void Matrix::columnij(unsigned int i, unsigned int j) {
     }
 }
 
-Matrix Matrix::T() {
+Matrix Matrix::T() const {
     int m = this->m;
     int n = this->n;
     Matrix X = Matrix(n, m);
@@ -101,7 +97,7 @@ Matrix Matrix::T() {
     return X;
 }
 
-Matrix Matrix::inverse() {
+Matrix Matrix::inverse() const {
     if(det(*this) == 0) {
         throw(std::logic_error("det(Matrix) = 0, not inverse"));
     }
@@ -134,7 +130,7 @@ Matrix Matrix::inverse() {
     return X;
 }
 
-double Matrix::xi(double x) {
+double Matrix::xi(double x) const {
     if (n != m) {
         throw(std::logic_error("the matrix has no characteristic polynomial"));
     }
@@ -159,7 +155,7 @@ Matrix& Matrix::operator= (const Matrix& B) {
 Matrix& Matrix::operator= (Matrix&& B) {
     std::swap(m, B.m);
     std::swap(n, B.n);
-    std::swap(R, B.R);
+    std::swap(accuracy, B.accuracy);
     std::swap(V, B.V);
     return *this;
 }
@@ -202,7 +198,7 @@ Vector& Matrix::operator[] (unsigned int i) {
     return V[i];
 }
 
-Matrix Matrix::operator+ (const Matrix& B) {
+Matrix Matrix::operator+ (const Matrix& B) const {
     int m = this->m;
     int n = this->n;
     if (m != B.m && n != B.n) {
@@ -216,11 +212,11 @@ Matrix Matrix::operator+ (const Matrix& B) {
     return C;
 }
 
-Matrix Matrix::operator- () {
+Matrix Matrix::operator- () const {
     return *this * (-1);
 }
 
-Matrix Matrix::operator- (const Matrix& B) {
+Matrix Matrix::operator- (const Matrix& B) const {
     int m = this->m;
     int n = this->n;
     if (m != B.m && n != B.n) {
@@ -234,22 +230,20 @@ Matrix Matrix::operator- (const Matrix& B) {
     return C;
 }
 
-Vector Matrix::operator* (Vector& b) {
-    int m = this->m;
-    int n = this->n;
-    if (b.get_N() != n) {
+Vector Matrix::operator* (Vector& b) const {
+    int N = b.get_size();
+    if (N != n) {
         throw(std::logic_error("Matrix*Vector not correct, the sizes do not match"));
     }
-    Vector t = o(m);
-    for (int i = 0; i < m; i++) {
-        for (int j = 0; j < n; j++) {
-            t[i] += V[i][j]*b[j];
-        }
+    Matrix B = Matrix(n, 1);
+    for (int i = 0; i < n; i++) {
+        B[i][0] = b[i];
     }
-    return t;
+    Matrix C = (*this * B).T();
+    return C[0];
 }
 
-Matrix Matrix::operator* (double a) {
+Matrix Matrix::operator* (double a) const {
     int m = this->m;
     Matrix C = Matrix(m, n);
     for (int i = 0; i < m; i++) {
@@ -259,7 +253,7 @@ Matrix Matrix::operator* (double a) {
     return C;
 }
 
-Matrix Matrix::operator* (Matrix& B) {
+Matrix Matrix::operator* (const Matrix& B) const {
     int m = this->m;
     int n = this->n;
     int m1 = B.m;
@@ -269,52 +263,109 @@ Matrix Matrix::operator* (Matrix& B) {
     }
     Matrix T = O(m, n1);
     if (m > 3) {
-        std::thread a = std::thread([m, n, n1, &T, &B, this]() {
-            for (int i = 0; i < m / 4; i++) {
-                for (int j = 0; j < n1; j++) {
-                    for (int k = 0; k < n; k++) {
-                        T.V[i][j] += V[i][k] * B.V[k][j];
+        if (m * n * n1 > 500000) {
+            std::thread a = std::thread([m, n, n1, &T, &B, this]() {
+                for (int i = 0; i < m / 4; i++) {
+                    for (int j = 0; j < n1; j++) {
+                        for (int k = 0; k < n; k++) {
+                            T.V[i][j] += V[i][k] * B.V[k][j];
+                        }
                     }
                 }
-            }
-            });
-        std::thread b = std::thread([m, n, n1, &T, &B, this]() {
-            for (int i = m / 4; i < m / 2; i++) {
-                for (int j = 0; j < n1; j++) {
-                    for (int k = 0; k < n; k++) {
-                        T.V[i][j] += V[i][k] * B.V[k][j];
+                });
+            std::thread b = std::thread([m, n, n1, &T, &B, this]() {
+                for (int i = m / 4; i < m / 2; i++) {
+                    for (int j = 0; j < n1; j++) {
+                        for (int k = 0; k < n; k++) {
+                            T.V[i][j] += V[i][k] * B.V[k][j];
+                        }
                     }
                 }
-            }
-            });
-        std::thread c = std::thread([m, n, n1, &T, &B, this]() {
-            for (int i = m / 2; i < 3 * m / 4; i++) {
-                for (int j = 0; j < n1; j++) {
-                    for (int k = 0; k < n; k++) {
-                        T.V[i][j] += V[i][k] * B.V[k][j];
+                });
+            std::thread c = std::thread([m, n, n1, &T, &B, this]() {
+                for (int i = m / 2; i < 3 * m / 4; i++) {
+                    for (int j = 0; j < n1; j++) {
+                        for (int k = 0; k < n; k++) {
+                            T.V[i][j] += V[i][k] * B.V[k][j];
+                        }
                     }
                 }
-            }
-            });
-        std::thread d = std::thread([m, n, n1, &T, &B, this]() {
-            for (int i = 3 * m / 4; i < m; i++) {
-                for (int j = 0; j < n1; j++) {
-                    for (int k = 0; k < n; k++) {
-                        T.V[i][j] += V[i][k] * B.V[k][j];
+                });
+            std::thread d = std::thread([m, n, n1, &T, &B, this]() {
+                for (int i = 3 * m / 4; i < m; i++) {
+                    for (int j = 0; j < n1; j++) {
+                        for (int k = 0; k < n; k++) {
+                            T.V[i][j] += V[i][k] * B.V[k][j];
+                        }
                     }
                 }
-            }
-            });
-        a.join();
-        b.join();
-        c.join();
-        d.join();
+                });
+            a.join();
+            b.join();
+            c.join();
+            d.join();
+        }
     }
     else {
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n1; j++) {
-                for (int k = 0; k < n; k++) {
-                    T.V[i][j] += V[i][k] * B.V[k][j];
+        if (n1 > 3) {
+            if (m * n * n1 > 500000) {
+                std::thread a = std::thread([m, n, n1, &T, &B, this]() {
+                    for (int i = 0; i < m; i++) {
+                        for (int j = 0; j < n1 / 4; j++) {
+                            for (int k = 0; k < n; k++) {
+                                T.V[i][j] += V[i][k] * B.V[k][j];
+                            }
+                        }
+                    }
+                    });
+                std::thread b = std::thread([m, n, n1, &T, &B, this]() {
+                    for (int i = 0; i < m; i++) {
+                        for (int j = n1 / 4; j < n1 / 2; j++) {
+                            for (int k = 0; k < n; k++) {
+                                T.V[i][j] += V[i][k] * B.V[k][j];
+                            }
+                        }
+                    }
+                    });
+                std::thread c = std::thread([m, n, n1, &T, &B, this]() {
+                    for (int i = 0; i < m; i++) {
+                        for (int j = n1 / 2; j < 3 * n1 / 4; j++) {
+                            for (int k = 0; k < n; k++) {
+                                T.V[i][j] += V[i][k] * B.V[k][j];
+                            }
+                        }
+                    }
+                    });
+                std::thread d = std::thread([m, n, n1, &T, &B, this]() {
+                    for (int i = 0; i < m; i++) {
+                        for (int j = 3 * n1 / 4; j < n1; j++) {
+                            for (int k = 0; k < n; k++) {
+                                T.V[i][j] += V[i][k] * B.V[k][j];
+                            }
+                        }
+                    }
+                    });
+                a.join();
+                b.join();
+                c.join();
+                d.join();
+            }
+            else {
+                for (int i = 0; i < m; i++) {
+                    for (int j = 0; j < n1; j++) {
+                        for (int k = 0; k < n; k++) {
+                            T.V[i][j] += V[i][k] * B.V[k][j];
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n1; j++) {
+                    for (int k = 0; k < n; k++) {
+                        T.V[i][j] += V[i][k] * B.V[k][j];
+                    }
                 }
             }
         }
@@ -322,11 +373,11 @@ Matrix Matrix::operator* (Matrix& B) {
     return T;
 }
 
-Matrix Matrix::operator/ (double a) {
+Matrix Matrix::operator/ (double a) const {
     return *this * (1.0/a);
 }
 
-Matrix Matrix::operator^ (int n) {
+Matrix Matrix::operator^ (int n) const {
     if (m != n) {
         throw(std::logic_error("Matrix^N not correct, the sizes do not match"));
     }
@@ -349,19 +400,19 @@ Matrix Matrix::operator^ (int n) {
     return C;
 }
 
-bool Matrix::operator== (const Matrix& B) {
+bool Matrix::operator== (const Matrix& B) const {
     int m = this->m;
     bool q = true;
     if (m == B.m) {
         for (int i = 0; i < m; i++) {
-            q = q && (V[i] == B.V[i]);
+            q &= (V[i] == B.V[i]);
         }
         return q;
     }
     return false;
 }
 
-bool Matrix::operator!= (const Matrix& B) {
+bool Matrix::operator!= (const Matrix& B) const {
     return !(*this == B);
 }
 
@@ -372,24 +423,20 @@ Matrix::~Matrix() {
     operator delete(V);
 }
 
-Vector operator* (Vector& a, Matrix& B) {
-    int N = a.get_N();
-    int m = B.get_m();
-    int n = B.get_n();
-    if (N != m) {
-        throw(std::logic_error("Vector*Matrix not correct, the sizes do not match"));
-    }
-    Vector t = o(n);
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < m; j++) {
-            t[i] += a[j] * B[j][i];
-        }
-    }
-    return t;
+Matrix operator* (double a, const Matrix& B) {
+    return B * a;
 }
 
-Matrix operator* (double a, Matrix& B) {
-    return B * a;
+Matrix operator* (Vector& a, const Matrix& B) {
+    int N = a.get_size();
+    if (N != B.get_m()) {
+        throw(std::logic_error("Vector*Matrix not correct, the sizes do not match"));
+    }
+    Matrix A = Matrix(1, N);
+    for (int i = 0; i < N; i++) {
+        A[0][i] = a[i];
+    }
+    return A*B;
 }
 
 Matrix E(unsigned int n) {
@@ -433,7 +480,7 @@ double tr(Matrix& A) {
 double det(Matrix A) {
     int n = A.get_n();
     int m = A.get_m();
-    int R = A.get_R();
+    int R = A.get_accuracy();
     double x = 1;
     if (n == m) {
         for (int j = 0; j < n; j++) {
@@ -465,7 +512,7 @@ int rg(Matrix A) {
     int x = 0;
     int n = A.get_n();
     int m = A.get_m();
-    int R = A.get_R();
+    int R = A.get_accuracy();
     for (int j = 0; j < n; j++) {
         int i = x;
         while (i < m && (int)(A[i][j]*R)/10 == 0) {
@@ -486,7 +533,7 @@ int rg(Matrix A) {
 }
 
 Matrix SOL(Matrix& A, Vector& b) {
-    int N = b.get_N();
+    int N = b.get_size();
     int n = A.get_n();
     int m = A.get_m();
     if(N != m) {
