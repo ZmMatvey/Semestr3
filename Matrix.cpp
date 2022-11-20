@@ -305,6 +305,15 @@ Matrix Matrix::operator* (const Matrix& B) const {
             c.join();
             d.join();
         }
+        else {
+            for (int i = 0; i < m; i++) {
+                for (int j = 0; j < n1; j++) {
+                    for (int k = 0; k < n; k++) {
+                       T.V[i][j] += V[i][k] * B.V[k][j];
+                    }
+                }
+            }
+        }
     }
     else {
         if (n1 > 3) {
